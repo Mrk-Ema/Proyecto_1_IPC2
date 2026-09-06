@@ -11,7 +11,7 @@ public class Usuario {
     private String password;
     private String rol;
     private double saldoCartera;
-    private int idSucursal;
+    private int idSucursalOrigen;
     private boolean estado;
 
     public Usuario() {
@@ -103,12 +103,12 @@ public class Usuario {
         this.saldoCartera = saldoCartera;
     }
 
-    public int getIdSucursal() {
-        return idSucursal;
+    public int getIdSucursalOrigen() {
+        return idSucursalOrigen;
     }
 
-    public void setIdSucursal(int idSucursal) {
-        this.idSucursal = idSucursal;
+    public void setIdSucursalOrigen(int idSucursalOrigen) {
+        this.idSucursalOrigen = idSucursalOrigen;
     }
 
     public boolean isEstado() {

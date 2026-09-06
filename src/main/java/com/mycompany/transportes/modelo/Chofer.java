@@ -10,6 +10,7 @@ public class Chofer {
     private String tipoLicencia;
     private Date fechaVencimientoLicencia;
     private double salarioBaseViaje;
+    private String disponibilidad;
 
     public Chofer() {
     }
@@ -69,5 +70,13 @@ public class Chofer {
 
     public void setSalarioBaseViaje(double salarioBaseViaje) {
         this.salarioBaseViaje = salarioBaseViaje;
+    }
+
+    public String getDisponibilidad() {
+        return disponibilidad;
+    }
+
+    public void setDisponibilidad(String disponibilidad) {
+        this.disponibilidad = disponibilidad;
     }
 }

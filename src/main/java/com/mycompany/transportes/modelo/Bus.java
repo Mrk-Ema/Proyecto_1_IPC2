@@ -10,13 +10,15 @@ public class Bus {
     private int anoFabricacion;
     private int capacidadPasajeros;
     private double kilometrajeActual;
-    private int idSucursal;
+    private int idSucursalOrigen;
+    private int idSucursalActual;
+    private String disponibilidad;
     private boolean estado;
 
     public Bus() {
     }
 
-    public Bus(String placa, String foto, String marca, String modelo, int anoFabricacion, int capacidadPasajeros, double kilometrajeActual, int idSucursal) {
+    public Bus(String placa, String foto, String marca, String modelo, int anoFabricacion, int capacidadPasajeros, double kilometrajeActual, int idSucursalOrigen) {
         this.placa = placa;
         this.foto = foto;
         this.marca = marca;
@@ -24,7 +26,7 @@ public class Bus {
         this.anoFabricacion = anoFabricacion;
         this.capacidadPasajeros = capacidadPasajeros;
         this.kilometrajeActual = kilometrajeActual;
-        this.idSucursal = idSucursal;
+        this.idSucursalOrigen = idSucursalOrigen;
     }
 
     public int getIdBus() {
@@ -91,12 +93,28 @@ public class Bus {
         this.kilometrajeActual = kilometrajeActual;
     }
 
-    public int getIdSucursal() {
-        return idSucursal;
+    public int getIdSucursalOrigen() {
+        return idSucursalOrigen;
     }
 
-    public void setIdSucursal(int idSucursal) {
-        this.idSucursal = idSucursal;
+    public void setIdSucursalOrigen(int idSucursalOrigen) {
+        this.idSucursalOrigen = idSucursalOrigen;
+    }
+
+    public int getIdSucursalActual() {
+        return idSucursalActual;
+    }
+
+    public void setIdSucursalActual(int idSucursalActual) {
+        this.idSucursalActual = idSucursalActual;
+    }
+
+    public String getDisponibilidad() {
+        return disponibilidad;
+    }
+
+    public void setDisponibilidad(String disponibilidad) {
+        this.disponibilidad = disponibilidad;
     }
 
     public boolean isEstado() {
