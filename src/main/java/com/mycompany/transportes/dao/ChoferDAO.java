@@ -22,7 +22,7 @@ public class ChoferDAO {
             }
         }
         return lista;
-    }
+    }  
 
     public Chofer obtenerPorDpi(String dpi) throws SQLException {
         String sql = "SELECT * FROM chofer WHERE dpi = ?";

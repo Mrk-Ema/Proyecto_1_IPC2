@@ -58,6 +58,11 @@ public class Conexion {
     }
 
     public static Connection obtener() throws SQLException {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new SQLException("No se pudo cargar el driver de MySQL: " + e.getMessage());
+        }
         return DriverManager.getConnection(url, usuario, password);
     }
 }
