@@ -74,9 +74,14 @@ public class ChoferDAO {
     }
 
     public void crear(Chofer c) throws SQLException {
+        try (Connection conn = Conexion.obtener()) {
+            crear(conn, c);
+        }
+    }
+
+    public void crear(Connection conn, Chofer c) throws SQLException {
         String sql = "INSERT INTO chofer (dpi, foto, num_licencia, tipo_licencia, fecha_vencimiento_licencia, salario_base_viaje) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, c.getDpi());
             ps.setString(2, c.getFoto());
             ps.setString(3, c.getNumLicencia());

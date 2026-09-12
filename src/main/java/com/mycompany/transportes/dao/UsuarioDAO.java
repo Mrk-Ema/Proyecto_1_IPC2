@@ -83,9 +83,14 @@ public class UsuarioDAO {
     }
 
     public void crear(Usuario u) throws SQLException {
+        try (Connection conn = Conexion.obtener()) {
+            crear(conn, u);
+        }
+    }
+
+    public void crear(Connection conn, Usuario u) throws SQLException {
         String sql = "INSERT INTO usuario (dpi, nombre_completo, nit, telefono, direccion, correo, password, rol, saldo_cartera, id_sucursal_origen) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, u.getDpi());
             ps.setString(2, u.getNombreCompleto());
             ps.setString(3, u.getNit());

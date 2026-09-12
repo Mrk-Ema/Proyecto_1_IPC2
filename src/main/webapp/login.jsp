@@ -12,7 +12,7 @@
         <title>Login</title>
     </head>
     <body>
-        <h1>Bienvenido a Transportes Alamo </h1>
+        <h1>Bienvenido a Transportes Mrk </h1>
         <% if (request.getAttribute("error") != null) {%>
         <p style="color:red;"><%= request.getAttribute("error")%></p>
 

@@ -1,7 +1,7 @@
 package com.mycompany.transportes.servlets;
 
-import com.mycompany.transportes.dao.UsuarioDAO;
 import com.mycompany.transportes.modelo.Usuario;
+import com.mycompany.transportes.servicio.UsuarioService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -14,7 +14,7 @@ import java.sql.SQLException;
 @WebServlet(name = "SvLogin", urlPatterns = {"/SvLogin"})
 public class SvLogin extends HttpServlet {
 
-    private UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private UsuarioService usuarioService = new UsuarioService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -45,14 +45,14 @@ public class SvLogin extends HttpServlet {
         String password = request.getParameter("password");
 
         try {
-            Usuario usuario = usuarioDAO.obtenerPorCorreo(correo);
-            if (usuario != null && usuario.getPassword().equals(password) && usuario.isEstado()) {
+            Usuario usuario = usuarioService.autenticar(correo, password);
+            if (usuario != null) {
                 HttpSession session = request.getSession();
                 session.setAttribute("usuario", usuario);
                 session.removeAttribute("invitado");
                 response.sendRedirect("home.jsp");
             } else {
-                request.setAttribute("error", "Correo, contraseña incorrectos o usuario inactivo.");
+                request.setAttribute("error", "No es posible el acceso por un error en los datos o usuario inactivo.");
                 request.getRequestDispatcher("login.jsp").forward(request, response);
             }
         } catch (SQLException e) {
