@@ -80,7 +80,7 @@ public class BusDAO {
             ps.setString(2, b.getFoto());
             ps.setString(3, b.getMarca());
             ps.setString(4, b.getModelo());
-            ps.setInt(5, b.getAnoFabricacion());
+            ps.setInt(5, b.getAñoFabricacion());
             ps.setInt(6, b.getCapacidadPasajeros());
             ps.setDouble(7, b.getKilometrajeActual());
             ps.setInt(8, b.getIdSucursalOrigen());
@@ -103,7 +103,7 @@ public class BusDAO {
             ps.setString(2, b.getFoto());
             ps.setString(3, b.getMarca());
             ps.setString(4, b.getModelo());
-            ps.setInt(5, b.getAnoFabricacion());
+            ps.setInt(5, b.getAñoFabricacion());
             ps.setInt(6, b.getCapacidadPasajeros());
             ps.setInt(7, b.getIdBus());
             ps.executeUpdate();
@@ -165,7 +165,7 @@ public class BusDAO {
         b.setFoto(rs.getString("foto"));
         b.setMarca(rs.getString("marca"));
         b.setModelo(rs.getString("modelo"));
-        b.setAnoFabricacion(rs.getInt("año_fabricacion"));
+        b.setAñoFabricacion(rs.getInt("año_fabricacion"));
         b.setCapacidadPasajeros(rs.getInt("capacidad_pasajeros"));
         b.setKilometrajeActual(rs.getDouble("kilometraje_actual"));
         b.setIdSucursalOrigen(rs.getInt("id_sucursal_origen"));

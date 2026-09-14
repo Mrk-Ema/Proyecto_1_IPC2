@@ -85,10 +85,9 @@ public class BoletoDAO {
         return 0;
     }
 
-    public int crear(Boleto b) throws SQLException {
+    public int crear(Connection conn, Boleto b) throws SQLException {
         String sql = "INSERT INTO boleto (id_viaje, dpi_cliente, num_asiento, precio_pagado, fecha_pago) VALUES (?, ?, ?, ?, NOW())";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, b.getIdViaje());
             ps.setString(2, b.getDpiCliente());
             ps.setInt(3, b.getNumAsiento());

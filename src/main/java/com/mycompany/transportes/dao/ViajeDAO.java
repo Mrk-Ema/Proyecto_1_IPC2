@@ -2,22 +2,84 @@ package com.mycompany.transportes.dao;
 
 import com.mycompany.transportes.conexion.Conexion;
 import com.mycompany.transportes.modelo.Viaje;
+import com.mycompany.transportes.modelo.ViajeDisponible;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ViajeDAO {
 
+    public static final String VIAJES_DISPONIBLES_SELECT
+            = "SELECT "
+            + "    v.id_viaje, "
+            + "    v.id_ruta, "
+            + "    v.fecha_hora_salida_estimada, "
+            + "    v.fecha_hora_llegada_estimada, "
+            + "    so.nombre AS nombre_origen, "
+            + "    sd.nombre AS nombre_destino, "
+            + "    r.precio_boleto, "
+            + "    b.placa AS placa_bus, "
+            + "    b.capacidad_pasajeros "
+            + "FROM viaje v "
+            + "INNER JOIN ruta r ON v.id_ruta = r.id_ruta "
+            + "INNER JOIN sucursal so ON r.id_sucursal_origen = so.id_sucursal "
+            + "INNER JOIN sucursal sd ON r.id_sucursal_destino = sd.id_sucursal "
+            + "INNER JOIN bus b ON v.id_bus = b.id_bus "
+            + "WHERE v.tipo_viaje = 'REGULAR' "
+            + "  AND v.estado_operativo = 'PROGRAMADO' "
+            + "  AND r.estado = TRUE "
+            + "  AND b.estado = TRUE "
+            + "  AND so.estado = TRUE "
+            + "  AND sd.estado = TRUE ";
+
+    public List<ViajeDisponible> obtenerDisponiblesDetallado() throws SQLException {
+        String sql = VIAJES_DISPONIBLES_SELECT + " ORDER BY v.fecha_hora_salida_estimada ASC";
+        List<ViajeDisponible> lista = new ArrayList<>();
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                lista.add(mapearDisponible(rs));
+            }
+        }
+        return lista;
+    }
+
+    public ViajeDisponible obtenerDisponibleDetalladoPorId(int idViaje) throws SQLException {
+        String sql = VIAJES_DISPONIBLES_SELECT + " AND v.id_viaje = ?";
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idViaje);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapearDisponible(rs);
+                }
+            }
+        }
+        return null;   // null = ya no existe o no está PROGRAMADO o  talves ruta o bus inactivo
+    }
+
+    private ViajeDisponible mapearDisponible(ResultSet rs) throws SQLException {
+        ViajeDisponible vd = new ViajeDisponible();
+        vd.setIdViaje(rs.getInt("id_viaje"));
+        vd.setIdRuta(rs.getInt("id_ruta"));
+        vd.setFechaHoraSalida(rs.getString("fecha_hora_salida_estimada"));
+        vd.setFechaHoraLlegada(rs.getString("fecha_hora_llegada_estimada"));
+        vd.setNombreOrigen(rs.getString("nombre_origen"));
+        vd.setNombreDestino(rs.getString("nombre_destino"));
+        vd.setPrecioBoleto(rs.getDouble("precio_boleto"));
+        vd.setPlacaBus(rs.getString("placa_bus"));
+        vd.setCapacidadPasajeros(rs.getInt("capacidad_pasajeros"));
+        vd.setAsientosOcupados(new BoletoDAO().asientosOcupados(vd.getIdViaje()));
+        return vd;
+    }
+
     public List<Viaje> obtenerTodos() throws SQLException {
         String sql = "SELECT * FROM viaje";
         List<Viaje> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 lista.add(mapear(rs));
             }
@@ -27,8 +89,7 @@ public class ViajeDAO {
 
     public Viaje obtenerPorId(int id) throws SQLException {
         String sql = "SELECT * FROM viaje WHERE id_viaje = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -42,8 +103,7 @@ public class ViajeDAO {
     public List<Viaje> obtenerDisponibles(String fecha) throws SQLException {
         String sql = "SELECT * FROM viaje WHERE tipo_viaje = 'REGULAR' AND estado_operativo = 'PROGRAMADO' AND DATE(fecha_hora_salida_estimada) = ?";
         List<Viaje> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, fecha);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -57,8 +117,7 @@ public class ViajeDAO {
     public List<Viaje> obtenerPorSucursal(int idSucursal) throws SQLException {
         String sql = "SELECT v.* FROM viaje v INNER JOIN bus b ON v.id_bus = b.id_bus WHERE b.id_sucursal = ?";
         List<Viaje> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idSucursal);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -72,8 +131,7 @@ public class ViajeDAO {
     public List<Viaje> obtenerPorFechas(String inicio, String fin) throws SQLException {
         String sql = "SELECT * FROM viaje WHERE fecha_hora_salida_estimada BETWEEN ? AND ?";
         List<Viaje> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, inicio);
             ps.setString(2, fin);
             try (ResultSet rs = ps.executeQuery()) {
@@ -87,18 +145,12 @@ public class ViajeDAO {
 
     public int crear(Viaje v) throws SQLException {
         String sql = "INSERT INTO viaje (id_bus, dpi_chofer, id_ruta, tipo_viaje, fecha_hora_salida_estimada, fecha_hora_llegada_estimada, estado_operativo) VALUES (?, ?, ?, ?, ?, ?, 'PROGRAMADO')";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            if (v.getIdBus() > 0) {
-                ps.setInt(1, v.getIdBus());
-            } else {
-                ps.setNull(1, java.sql.Types.INTEGER);
-            }
-            if (v.getDpiChofer() != null && !v.getDpiChofer().isEmpty()) {
-                ps.setString(2, v.getDpiChofer());
-            } else {
-                ps.setNull(2, java.sql.Types.VARCHAR);
-            }
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setInt(1, v.getIdBus());
+
+            ps.setString(2, v.getDpiChofer());
+
             if (v.getIdRuta() > 0) {
                 ps.setInt(3, v.getIdRuta());
             } else {
@@ -119,8 +171,7 @@ public class ViajeDAO {
 
     public void actualizar(Viaje v) throws SQLException {
         String sql = "UPDATE viaje SET id_bus = ?, dpi_chofer = ?, id_ruta = ?, fecha_hora_salida_estimada = ?, fecha_hora_llegada_estimada = ? WHERE id_viaje = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             if (v.getIdBus() > 0) {
                 ps.setInt(1, v.getIdBus());
             } else {
@@ -154,8 +205,7 @@ public class ViajeDAO {
         }
 
         String sql = "UPDATE viaje SET fecha_hora_salida_real = ?, kilometraje_inicial = ?, estado_operativo = 'EN_TRANSITO' WHERE id_viaje = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, fechaReal);
             ps.setDouble(2, kmInicial);
             ps.setInt(3, id);
@@ -165,8 +215,7 @@ public class ViajeDAO {
 
     public void registrarLlegada(int id, String fechaReal, double kmFinal, double gastoCombustible, double depreciacion) throws SQLException {
         String sql = "UPDATE viaje SET fecha_hora_llegada_real = ?, kilometraje_final = ?, gasto_combustible = ?, monto_depreciacion = ?, estado_operativo = 'FINALIZADO' WHERE id_viaje = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, fechaReal);
             ps.setDouble(2, kmFinal);
             ps.setDouble(3, gastoCombustible);
@@ -178,8 +227,7 @@ public class ViajeDAO {
 
     public void eliminar(int id) throws SQLException {
         String sql = "DELETE FROM viaje WHERE id_viaje = ? AND estado_operativo = 'PROGRAMADO' AND id_viaje NOT IN (SELECT DISTINCT id_viaje FROM boleto WHERE id_viaje IS NOT NULL)";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
         }

@@ -7,7 +7,7 @@ public class Bus {
     private String foto;
     private String marca;
     private String modelo;
-    private int anoFabricacion;
+    private int añoFabricacion;
     private int capacidadPasajeros;
     private double kilometrajeActual;
     private int idSucursalOrigen;
@@ -18,12 +18,12 @@ public class Bus {
     public Bus() {
     }
 
-    public Bus(String placa, String foto, String marca, String modelo, int anoFabricacion, int capacidadPasajeros, double kilometrajeActual, int idSucursalOrigen) {
+    public Bus(String placa, String foto, String marca, String modelo, int añoFabricacion, int capacidadPasajeros, double kilometrajeActual, int idSucursalOrigen) {
         this.placa = placa;
         this.foto = foto;
         this.marca = marca;
         this.modelo = modelo;
-        this.anoFabricacion = anoFabricacion;
+        this.añoFabricacion = añoFabricacion;
         this.capacidadPasajeros = capacidadPasajeros;
         this.kilometrajeActual = kilometrajeActual;
         this.idSucursalOrigen = idSucursalOrigen;
@@ -69,12 +69,12 @@ public class Bus {
         this.modelo = modelo;
     }
 
-    public int getAnoFabricacion() {
-        return anoFabricacion;
+    public int getAñoFabricacion() {
+        return añoFabricacion;
     }
 
-    public void setAnoFabricacion(int anoFabricacion) {
-        this.anoFabricacion = anoFabricacion;
+    public void setAñoFabricacion(int añoFabricacion) {
+        this.añoFabricacion = añoFabricacion;
     }
 
     public int getCapacidadPasajeros() {

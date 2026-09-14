@@ -31,14 +31,7 @@
             </ul>
            
 
-            <% if (usuarioActual == null) { %>
-            <p><em>Para reservar o solicitar un servicio, debes 
-                    <a href="login.jsp">iniciar sesión</a> o 
-                    <a href="registro.jsp">crear una cuenta</a>.</em></p>
-                    <% } else { %>
-            <a href="#">Reservar boleto</a>
-            <a href="#">Solicitar alquiler</a>
-            <% }%>
+            
 
         </div>
     </body>

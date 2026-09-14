@@ -1,0 +1,73 @@
+<%-- 
+    Document   : seleccionAsientos
+    Created on : 13 sept 2026, 4:47:40
+    Author     : mrk-ema
+--%>
+
+<%@page import="com.mycompany.transportes.modelo.ViajeDisponible"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Selección de Asientos - Transportes MRK</title>
+    </head>
+    <body>
+        <%@ include file="header.jsp" %>   
+
+        <div class="contenido">
+            <h2>Selecciona tus asientos</h2>
+
+            <% String error = (String) request.getAttribute("error");
+                if ("no_disponible".equals(error)) { %>
+                <p>El viaje ya no está disponible, elige otro.</p>
+                <% } %>
+
+            <%
+                ViajeDisponible v = (ViajeDisponible) request.getAttribute("viajeDisponible");
+                boolean esCliente = usuarioActual != null && "CLIENTE".equals(usuarioActual.getRol());
+                int libres = v.getAsientosLibresCount();
+                boolean lleno = libres <= 0;
+            %>
+
+            <p><strong><%= v.getNombreOrigen()%>  →  <%= v.getNombreDestino()%></strong><br>
+                Salida:  <%= v.getFechaHoraSalida()%><br>
+                Llegada:  <%= v.getFechaHoraLlegada()%><br>
+                Bus: <%= v.getPlacaBus()%>  |  Precio boleto: Q<%= v.getPrecioBoleto()%><br>
+                Asientos disponibles: <%= libres%></p>
+
+            <% if (!esCliente) { %>
+            <p>Para seleccionar asientos debes
+                <a href="SvLogin?accion=sinRegistro">iniciar sesión</a> o
+                <a href="registro.jsp">crear tu cuenta</a>.</p>
+                <% } else if (lleno) { %>
+            <p>Este viaje ya no tiene asientos disponibles.</p>
+            <% }%>
+
+            <form action="SvBoleto" method="post">
+                <input type="hidden" name="accion" value="preparar">
+                <input type="hidden" name="idViaje" value="<%= v.getIdViaje()%>">
+
+                <table>
+                    <tr>
+                        <% for (int i = 1; i <= v.getCapacidadPasajeros(); i++) {
+                            boolean tomado = v.getAsientosOcupados().contains(i);%>
+                        <td>
+                            <label>
+                                <input type="checkbox" name="asientos" value="<%= i%>"
+                                       <%= (tomado || !esCliente) ? "disabled" : ""%>>
+                                <%= i%><%= tomado ? " (ocupado)" : ""%>
+                            </label>
+                        </td>
+                        <% if (i % 6 == 0) { %></tr><tr><% } %>
+                        <% }%>
+                    </tr>
+                </table>
+
+                <button type="submit" <%= (!esCliente || lleno) ? "disabled" : ""%>>
+                    Continuar al pago
+                </button>
+            </form>
+        </div>
+    </body>
+</html>

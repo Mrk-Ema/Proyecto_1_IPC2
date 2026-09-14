@@ -10,15 +10,24 @@
     Usuario usuarioActual = (Usuario) session.getAttribute("usuario");
 %>
 <nav>
-    
+
     <a href="home.jsp">Transportes MRK</a>
-    <a href="servicios.jsp">Servicios</a>
+    <% if (usuarioActual == null) { %>
+    <a href="SvLogin?accion=sinRegistro">Comprar Boleto</a> 
+    <% } else {%>
+    <a href="SvViajeRegular">Comprar Boletos</a> 
+    <% }%>
+    <a href="servicios.jsp">Servicios</a> 
     <a href="quienesSomos.jsp">Quiénes Somos</a>
 
     <% if (usuarioActual == null) { %>
     <a href="login.jsp">Iniciar Sesión</a>
     <% } else {%>
     <span>Hola, <%= usuarioActual.getNombreCompleto()%></span>
+    <% if (usuarioActual.getRol().equals("CLIENTE")) {%>
+    <span> | Saldo: Q<%= String.format("%.2f", usuarioActual.getSaldoCartera())%></span>
+    <a href="recargar.jsp">Recargar</a>
+    <% } %>
     <% if (usuarioActual.getRol().equals("ADMIN_SISTEMA")) { %>
     <a href="panelAdminSistema.jsp">Desarrollador</a>
     <% } else if (usuarioActual.getRol().equals("ADMIN_SUCURSAL")) { %>

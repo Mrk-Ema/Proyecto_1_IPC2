@@ -33,6 +33,10 @@ public class SvLogin extends HttpServlet {
                 session.setAttribute("invitado", true);
                 response.sendRedirect("home.jsp");
                 return;
+            } else if (accion.equals("sinRegistro")) {
+                request.setAttribute("error", "Debes iniciar sesion para poder continuar con esta operacion.");
+                request.getRequestDispatcher("login.jsp").forward(request, response);
+                return;
             }
         }
         response.sendRedirect("login.jsp");

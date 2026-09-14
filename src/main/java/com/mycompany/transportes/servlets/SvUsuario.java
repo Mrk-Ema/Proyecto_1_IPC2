@@ -43,6 +43,21 @@ public class SvUsuario extends HttpServlet {
                     usuarioService.registrarChofer(nuevoChoferUsuario, nuevoChofer);
                     response.sendRedirect("crearChofer.jsp?exito=chofer_creado");
                 }
+                case "recargar" -> {
+                    HttpSession session = request.getSession(false);
+                    Usuario u = (Usuario) session.getAttribute("usuario");
+                    double monto = Double.parseDouble(request.getParameter("monto"));
+                    double nuevoSaldo = u.getSaldoCartera() + monto;
+                    usuarioService.recargarCartera(u.getDpi(), nuevoSaldo);
+                    u.setSaldoCartera(nuevoSaldo);
+                    session.setAttribute("usuario", u);
+                    String idViaje = request.getParameter("idViaje");
+                    if (idViaje != null && !idViaje.isEmpty()) {
+                        response.sendRedirect("SvViajeRegular?accion=asientos&idViaje=" + idViaje + "&recarga=ok");
+                    } else {
+                        response.sendRedirect("home.jsp?recarga=ok");
+                    }
+                }
                 default -> {
                     Usuario nuevoCliente = crearUsuarioDesdeRequest(request, "CLIENTE");
                     usuarioService.registrarCliente(nuevoCliente);

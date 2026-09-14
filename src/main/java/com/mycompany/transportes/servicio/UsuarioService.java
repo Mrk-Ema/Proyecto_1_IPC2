@@ -110,6 +110,10 @@ public class UsuarioService {
         }
     }
 
+    public void recargarCartera(String dpi, double nuevoSaldo) throws SQLException {
+        usuarioDAO.actualizarSaldo(dpi, nuevoSaldo);
+    }
+
     private boolean esVacio(String valor) {
         return valor == null || valor.trim().isEmpty();
     }

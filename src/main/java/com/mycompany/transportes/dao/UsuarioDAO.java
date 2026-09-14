@@ -13,8 +13,7 @@ public class UsuarioDAO {
 
     public Usuario obtenerPorDpi(String dpi) throws SQLException {
         String sql = "SELECT * FROM usuario WHERE dpi = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, dpi);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -27,8 +26,7 @@ public class UsuarioDAO {
 
     public Usuario obtenerPorCorreo(String correo) throws SQLException {
         String sql = "SELECT * FROM usuario WHERE correo = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, correo);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -42,9 +40,7 @@ public class UsuarioDAO {
     public List<Usuario> obtenerTodos() throws SQLException {
         String sql = "SELECT * FROM usuario";
         List<Usuario> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 lista.add(mapear(rs));
             }
@@ -55,8 +51,7 @@ public class UsuarioDAO {
     public List<Usuario> obtenerPorSucursal(int idSucursal) throws SQLException {
         String sql = "SELECT * FROM usuario WHERE id_sucursal_origen = ?";
         List<Usuario> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idSucursal);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -70,8 +65,7 @@ public class UsuarioDAO {
     public List<Usuario> obtenerPorRol(String rol) throws SQLException {
         String sql = "SELECT * FROM usuario WHERE rol = ?";
         List<Usuario> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, rol);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -111,8 +105,7 @@ public class UsuarioDAO {
 
     public void actualizar(Usuario u) throws SQLException {
         String sql = "UPDATE usuario SET nombre_completo = ?, nit = ?, telefono = ?, direccion = ?, correo = ? WHERE dpi = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, u.getNombreCompleto());
             ps.setString(2, u.getNit());
             ps.setString(3, u.getTelefono());
@@ -123,20 +116,24 @@ public class UsuarioDAO {
         }
     }
 
-    public void actualizarSaldo(String dpi, double saldo) throws SQLException {
+    public void actualizarSaldo(Connection conn, String dpi, double saldo) throws SQLException {
         String sql = "UPDATE usuario SET saldo_cartera = ? WHERE dpi = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDouble(1, saldo);
             ps.setString(2, dpi);
             ps.executeUpdate();
         }
     }
 
+    public void actualizarSaldo(String dpi, double saldo) throws SQLException {
+        try (Connection conn = Conexion.obtener()) {
+            actualizarSaldo(conn, dpi, saldo);
+        }
+    }
+
     public void desactivar(String dpi) throws SQLException {
         String sql = "UPDATE usuario SET estado = FALSE WHERE dpi = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, dpi);
             ps.executeUpdate();
         }
