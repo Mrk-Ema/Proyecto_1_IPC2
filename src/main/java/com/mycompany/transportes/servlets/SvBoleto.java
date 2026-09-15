@@ -39,7 +39,7 @@ public class SvBoleto extends HttpServlet {
         }
     }
 
-    // Paso 1: viene de la pagina de asientos -> mostrar resumen de pago
+    // viene de la pagina de asientos y ahora muestra el resumen de pago
     private void preparar(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -80,7 +80,7 @@ public class SvBoleto extends HttpServlet {
         }
     }
 
-    // Paso 2: viene de pagarBoleto -> procesar compra
+    // viene de pagarBoleto y ahora procesa la compra
     private void pagar(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 

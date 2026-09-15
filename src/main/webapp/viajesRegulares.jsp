@@ -19,8 +19,6 @@
            <% String error = (String) request.getAttribute("error");
            if ("no_disponible".equals(error)) { %>
            <p>El viaje ya no está disponible.</p><% }
-             else if ("id_invalido".equals(error)) { %>
-             <p>Viaje inválido.</p><% }
              else if ("sistema".equals(error)) { %>
              <p>Error del sistema, intenta de nuevo.</p>
            <% } %>

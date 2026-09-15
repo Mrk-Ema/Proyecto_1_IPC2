@@ -24,16 +24,19 @@
             <p>Saldo actual: <strong>Q<%= String.format("%.2f", usuarioActual.getSaldoCartera())%></strong></p>
 
             <form action="SvUsuario" method="post">
-                <input type="hidden" name="accion" value="recargar">
+                <input type="hidden" name="tipoRegistro" value="recargar">
                 <input type="hidden" name="idViaje" value="<%= request.getParameter("idViaje")%>">
-                <input type="hidden" name="asientos" value="<%= request.getParameter("asientos")%>">
                 <label>Monto a recargar (Q):
                     <input type="number" step="0.01" min="1" name="monto" required>
                 </label>
                 <button type="submit">Recargar</button>
             </form>
 
+            <% if (request.getParameter("idViaje") != null) {%>
+            <p><a href="SvViajeRegular?accion=asientos&idViaje=<%= request.getParameter("idViaje")%>">Volver al viaje</a></p>
+            <% } else { %>
             <p><a href="SvViajeRegular">Volver al catálogo</a></p>
+            <% }%>
         </div>
     </body>
 </html>

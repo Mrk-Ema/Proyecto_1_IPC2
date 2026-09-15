@@ -14,8 +14,7 @@ public class AlquilerPrivadoDAO {
 
     public AlquilerPrivado obtenerPorId(int id) throws SQLException {
         String sql = "SELECT * FROM alquiler_privado WHERE id_alquiler = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -29,8 +28,7 @@ public class AlquilerPrivadoDAO {
     public List<AlquilerPrivado> obtenerPorCliente(String dpi) throws SQLException {
         String sql = "SELECT * FROM alquiler_privado WHERE dpi_cliente = ?";
         List<AlquilerPrivado> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, dpi);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -44,9 +42,7 @@ public class AlquilerPrivadoDAO {
     public List<AlquilerPrivado> obtenerPendientes() throws SQLException {
         String sql = "SELECT * FROM alquiler_privado WHERE estado_pago = 'SOLICITADO'";
         List<AlquilerPrivado> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 lista.add(mapear(rs));
             }
@@ -57,8 +53,7 @@ public class AlquilerPrivadoDAO {
     public List<AlquilerPrivado> obtenerPorFechas(String inicio, String fin) throws SQLException {
         String sql = "SELECT * FROM alquiler_privado WHERE fecha_salida BETWEEN ? AND ?";
         List<AlquilerPrivado> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, inicio);
             ps.setString(2, fin);
             try (ResultSet rs = ps.executeQuery()) {
@@ -72,8 +67,7 @@ public class AlquilerPrivadoDAO {
 
     public int crear(AlquilerPrivado a) throws SQLException {
         String sql = "INSERT INTO alquiler_privado (dpi_cliente, id_viaje, origen, destino, fecha_salida, fecha_retorno, numero_pasajeros, precio_estimado, estado_pago) VALUES (?, NULL, ?, ?, ?, ?, ?, ?, 'SOLICITADO')";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, a.getDpiCliente());
             ps.setString(2, a.getOrigen());
             ps.setString(3, a.getDestino());
@@ -93,8 +87,7 @@ public class AlquilerPrivadoDAO {
 
     public void confirmarPrecio(int id, double precioConfirmado, double salarioChofer) throws SQLException {
         String sql = "UPDATE alquiler_privado SET precio_confirmado = ?, salario_chofer_calculado = ?, estado_pago = 'CONFIRMADO' WHERE id_alquiler = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDouble(1, precioConfirmado);
             ps.setDouble(2, salarioChofer);
             ps.setInt(3, id);
@@ -104,18 +97,16 @@ public class AlquilerPrivadoDAO {
 
     public void asignarBus(int id, int idViaje) throws SQLException {
         String sql = "UPDATE alquiler_privado SET id_viaje = ? WHERE id_alquiler = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idViaje);
             ps.setInt(2, id);
             ps.executeUpdate();
         }
     }
 
-    public void pagar(int id) throws SQLException {
+    public void pagar(Connection conn, int id) throws SQLException {
         String sql = "UPDATE alquiler_privado SET estado_pago = 'PAGADO', fecha_pago = NOW() WHERE id_alquiler = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
         }

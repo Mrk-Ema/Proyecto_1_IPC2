@@ -16,6 +16,8 @@
     <a href="SvLogin?accion=sinRegistro">Comprar Boleto</a> 
     <% } else {%>
     <a href="SvViajeRegular">Comprar Boletos</a> 
+    <a href="SvAlquiler">Alquilar Bus</a>
+    <a href="SvAlquiler?accion=mis">Mis Alquileres</a>
     <% }%>
     <a href="servicios.jsp">Servicios</a> 
     <a href="quienesSomos.jsp">Quiénes Somos</a>

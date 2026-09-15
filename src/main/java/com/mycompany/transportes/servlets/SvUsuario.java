@@ -53,7 +53,12 @@ public class SvUsuario extends HttpServlet {
                     session.setAttribute("usuario", u);
                     String idViaje = request.getParameter("idViaje");
                     if (idViaje != null && !idViaje.isEmpty()) {
-                        response.sendRedirect("SvViajeRegular?accion=asientos&idViaje=" + idViaje + "&recarga=ok");
+                        try {
+                            Integer.parseInt(idViaje);
+                            response.sendRedirect("SvViajeRegular?accion=asientos&idViaje=" + idViaje + "&recarga=ok");
+                        } catch (NumberFormatException e) {
+                            response.sendRedirect("home.jsp");
+                        }
                     } else {
                         response.sendRedirect("home.jsp?recarga=ok");
                     }
