@@ -14,8 +14,9 @@
     <body>
          <%@ include file="header.jsp" %>
          <div class="contenido">
-             <h1>Panel de Administrador de sucursal </h1>
-              <a href="crearChofer.jsp">Crear Chofer</a>
+             <h1>Panel de Administrador de sucursal</h1>
+             <a href="crearChofer.jsp">Crear Chofer</a> | 
+             <a href="SvAlquiler?accion=pendientes">Alquileres por Confirmar</a>
         </div>
     </body>
 </html>

@@ -27,6 +27,9 @@ public class SvAlquiler extends HttpServlet {
         if ("mis".equals(accion)) {
             mostrarMisAlquileres(request, response, null, null);
             return;
+        } else if ("pendientes".equals(accion)) {
+            mostrarPendientes(request, response, null);
+            return;
         }
         request.getRequestDispatcher("alquilerPrivado.jsp").forward(request, response);
     }
@@ -39,6 +42,12 @@ public class SvAlquiler extends HttpServlet {
         if ("pagar".equals(accion)) {
             pagar(request, response);
             return;
+        } else if ("confirmar".equals(accion)) {
+            confirmar(request, response);
+            return;
+        } else if ("rechazar".equals(accion)) {
+            rechazar(request, response);
+            return;
         }
 
         HttpSession session = request.getSession(false);
@@ -48,7 +57,7 @@ public class SvAlquiler extends HttpServlet {
             return;
         }
 
-        // leer los campos del formulario
+        // leer los campos del forumlario
         String origen = request.getParameter("origen");
         String destino = request.getParameter("destino");
         String fechaSalida = request.getParameter("fechaSalida");
@@ -59,7 +68,7 @@ public class SvAlquiler extends HttpServlet {
         } catch (NumberFormatException e) {
         }
 
-        // aca se valida ls campos obligatorios
+        // validar campos obligatorios
         if (origen == null || origen.isBlank() || destino == null || destino.isBlank()) {
             enviarError(request, response, "Origen y destino son obligatorios.");
             return;
@@ -74,7 +83,7 @@ public class SvAlquiler extends HttpServlet {
             return;
         }
 
-        // calcular precio de pasajeros y fechas, y lo guarda en solicitar
+        // calcular precio asi como validar también pasajeros y fechas, y guardar como atributo
         try {
             double precioEstimado = alquilerService.calcularPrecioEstimado(fechaSalida, fechaRetorno, numeroPasajeros);
 
@@ -156,6 +165,71 @@ public class SvAlquiler extends HttpServlet {
         request.setAttribute("error", error);
         request.setAttribute("faltante", faltante);
         request.getRequestDispatcher("misAlquileres.jsp").forward(request, response);
+    }
+
+    private void confirmar(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        Usuario usuario = (session != null) ? (Usuario) session.getAttribute("usuario") : null;
+        if (usuario == null || !"ADMIN_SUCURSAL".equals(usuario.getRol())) {
+            response.sendRedirect("login.jsp?error=acceso_denegado");
+            return;
+        }
+        try {
+            int idAlquiler = Integer.parseInt(request.getParameter("idAlquiler"));
+            double precioConfirmado = Double.parseDouble(request.getParameter("precioConfirmado"));
+
+            if (precioConfirmado <= 0) {
+                mostrarPendientes(request, response, "El precio debe ser mayor a cero.");
+                return;
+            }
+            alquilerService.confirmarPrecio(idAlquiler, precioConfirmado);
+
+            mostrarPendientes(request, response, "Alquiler #" + idAlquiler + " confirmado con éxito.");
+        } catch (NumberFormatException e) {
+            mostrarPendientes(request, response, "Valores numéricos inválidos.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarPendientes(request, response, "Error al confirmar el alquiler.");
+        }
+    }
+
+    private void rechazar(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        Usuario usuario = (session != null) ? (Usuario) session.getAttribute("usuario") : null;
+        if (usuario == null || !"ADMIN_SUCURSAL".equals(usuario.getRol())) {
+            response.sendRedirect("login.jsp?error=acceso_denegado");
+            return;
+        }
+        try {
+            int idAlquiler = Integer.parseInt(request.getParameter("idAlquiler"));
+            alquilerService.rechazarAlquiler(idAlquiler);
+            mostrarPendientes(request, response, "Alquiler #" + idAlquiler + " rechazado.");
+        } catch (NumberFormatException e) {
+            mostrarPendientes(request, response, "ID de alquiler inválido.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarPendientes(request, response, "Error al rechazar el alquiler.");
+        }
+    }
+
+    private void mostrarPendientes(HttpServletRequest request, HttpServletResponse response, String mensaje)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        Usuario usuario = (session != null) ? (Usuario) session.getAttribute("usuario") : null;
+        if (usuario == null || !"ADMIN_SUCURSAL".equals(usuario.getRol())) {
+            response.sendRedirect("login.jsp?error=acceso_denegado");
+            return;
+        }
+        try {
+            request.setAttribute("pendientes", alquilerService.obtenerAlquileresPendientes());
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("pendientes", new java.util.ArrayList<>());
+        }
+        request.setAttribute("mensaje", mensaje);
+        request.getRequestDispatcher("alquileresPendientes.jsp").forward(request, response);
     }
 
     private void enviarError(HttpServletRequest request, HttpServletResponse response, String mensaje)

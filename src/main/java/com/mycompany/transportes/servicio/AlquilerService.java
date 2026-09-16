@@ -117,4 +117,16 @@ public class AlquilerService {
     public int solicitar(AlquilerPrivado a) throws SQLException {
         return alquilerDAO.crear(a);
     }
+
+    public List<AlquilerPrivado> obtenerAlquileresPendientes() throws SQLException {
+        return alquilerDAO.obtenerPendientes();
+    }
+
+    public void confirmarPrecio(int id, double precioConfirmado) throws SQLException {
+        alquilerDAO.confirmarPrecio(id, precioConfirmado);
+    }
+
+    public void rechazarAlquiler(int id) throws SQLException {
+        alquilerDAO.rechazar(id);
+    }
 }

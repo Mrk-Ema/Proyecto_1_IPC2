@@ -27,7 +27,7 @@
                 <input type="hidden" name="tipoRegistro" value="recargar">
                 <input type="hidden" name="idViaje" value="<%= request.getParameter("idViaje")%>">
                 <label>Monto a recargar (Q):
-                    <input type="number" step="0.01" min="1" name="monto" required>
+                    <input type="number" step="0.1" min="1" name="monto" required>
                 </label>
                 <button type="submit">Recargar</button>
             </form>

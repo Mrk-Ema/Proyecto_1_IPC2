@@ -59,7 +59,7 @@ public class SvBoleto extends HttpServlet {
                 response.sendRedirect("SvViajeRegular?accion=asientos&idViaje=" + idViaje + "&error=no_disponible");
                 return;
             }
-            // Re-verificar: si un asiento ya se ocupo, mandar de vuelta actualizado
+            // Re-verificar si un asiento ya se ocupo, mandar de vuelta actualizado
             for (Integer a : asientos) {
                 if (viaje.getAsientosOcupados().contains(a)) {
                     response.sendRedirect("SvViajeRegular?accion=asientos&idViaje=" + idViaje + "&error=asientos_tomados");

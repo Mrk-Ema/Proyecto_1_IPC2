@@ -85,12 +85,11 @@ public class AlquilerPrivadoDAO {
         return -1;
     }
 
-    public void confirmarPrecio(int id, double precioConfirmado, double salarioChofer) throws SQLException {
-        String sql = "UPDATE alquiler_privado SET precio_confirmado = ?, salario_chofer_calculado = ?, estado_pago = 'CONFIRMADO' WHERE id_alquiler = ?";
+    public void confirmarPrecio(int id, double precioConfirmado) throws SQLException {
+        String sql = "UPDATE alquiler_privado SET precio_confirmado = ?, estado_pago = 'CONFIRMADO' WHERE id_alquiler = ?";
         try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDouble(1, precioConfirmado);
-            ps.setDouble(2, salarioChofer);
-            ps.setInt(3, id);
+            ps.setInt(2, id);
             ps.executeUpdate();
         }
     }
@@ -107,6 +106,14 @@ public class AlquilerPrivadoDAO {
     public void pagar(Connection conn, int id) throws SQLException {
         String sql = "UPDATE alquiler_privado SET estado_pago = 'PAGADO', fecha_pago = NOW() WHERE id_alquiler = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        }
+    }
+
+    public void rechazar(int id) throws SQLException {
+        String sql = "UPDATE alquiler_privado SET estado_pago = 'RECHAZADO' WHERE id_alquiler = ?";
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
         }
