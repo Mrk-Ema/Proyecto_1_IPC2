@@ -25,6 +25,17 @@
             <p style="color:green;"><%= request.getAttribute("msj")%></p>
             <% } %>
 
+            <form action="SvBus" method="GET" style="margin-bottom:10px;">
+                <input type="hidden" name="accion" value="listar">
+                <label>Estado operativo:</label>
+                <select name="filtro">
+                    <option value="TODOS" ${empty filtro || filtro == 'TODOS' ? 'selected' : ''}>Todos</option>
+                    <option value="Disponible" ${filtro == 'Disponible' ? 'selected' : ''}>Disponible</option>
+                    <option value="Ocupado" ${filtro == 'Ocupado' ? 'selected' : ''}>Ocupado</option>
+                    <option value="Taller" ${filtro == 'Taller' ? 'selected' : ''}>En taller</option>
+                </select>
+                <button type="submit">Filtrar</button>
+            </form>
             <a href="SvBus?accion=formCrear">Nuevo Bus</a> |
             <a href="panelAdminSucursal.jsp">Volver al panel</a>
 
@@ -64,10 +75,10 @@
                     <td><%= b.getDisponibilidad()%></td>
                     <td>
                         <% if (b.getViajesActivos() == 0) { %>
-                            <span style="color:green;">Ninguno</span>
-                        <% } else { %>
-                            <span style="color:red;"><%= b.getViajesActivos() %> en curso</span>
-                        <% } %>
+                        <span style="color:green;">Ninguno</span>
+                        <% } else {%>
+                        <span style="color:red;"><%= b.getViajesActivos()%> en curso</span>
+                        <% }%>
                     </td>
                     <td><%= b.isEstado() ? "Activo" : "Inactivo"%></td>
                     <td>

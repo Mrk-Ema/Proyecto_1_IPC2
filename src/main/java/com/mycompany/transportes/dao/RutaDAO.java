@@ -12,17 +12,6 @@ import java.util.List;
 
 public class RutaDAO {
 
-    public List<Ruta> obtenerTodas() throws SQLException {
-        String sql = "SELECT * FROM ruta";
-        List<Ruta> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                lista.add(mapear(rs));
-            }
-        }
-        return lista;
-    }
-
     public Ruta obtenerPorId(int id) throws SQLException {
         String sql = "SELECT * FROM ruta WHERE id_ruta = ?";
         try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -34,20 +23,6 @@ public class RutaDAO {
             }
         }
         return null;
-    }
-
-    public List<Ruta> obtenerPorSucursalOrigen(int idSucursal) throws SQLException {
-        String sql = "SELECT * FROM ruta WHERE id_sucursal_origen = ?";
-        List<Ruta> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, idSucursal);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    lista.add(mapear(rs));
-                }
-            }
-        }
-        return lista;
     }
 
     public List<Ruta> obtenerPorSucursalConNombres(int idSucursal) throws SQLException {

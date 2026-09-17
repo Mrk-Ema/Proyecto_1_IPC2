@@ -104,7 +104,9 @@ public class SvBus extends HttpServlet {
     private void listar(HttpServletRequest request, HttpServletResponse response, String msj, String error)
             throws ServletException, IOException {
         try {
-            List<Bus> buses = busService.listarPorSucursal(sesionAdmin(request).getIdSucursalOrigen());
+            String filtro = request.getParameter("filtro");
+            List<Bus> buses = busService.listarPorSucursal(sesionAdmin(request).getIdSucursalOrigen(), filtro);
+            request.setAttribute("filtro", filtro);
             request.setAttribute("buses", buses);
             if (msj != null) {
                 request.setAttribute("msj", msj);

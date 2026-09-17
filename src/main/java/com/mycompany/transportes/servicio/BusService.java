@@ -20,6 +20,14 @@ public class BusService {
         return busDAO.obtenerPorSucursalConViajesActivos(idSucursal);
     }
 
+    public List<Bus> listarPorSucursal(int idSucursal, String filtro) throws SQLException {
+        List<Bus> lista = busDAO.obtenerPorSucursalConViajesActivos(idSucursal);
+        if (filtro != null && !filtro.trim().isEmpty() && !"TODOS".equalsIgnoreCase(filtro)) {
+            lista.removeIf(b -> !filtro.equalsIgnoreCase(b.getDisponibilidad()));
+        }
+        return lista;
+    }
+
     public Bus obtenerPorId(int id) throws SQLException {
         return busDAO.obtenerPorId(id);
     }
