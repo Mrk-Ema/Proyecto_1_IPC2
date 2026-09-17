@@ -15,9 +15,7 @@ public class BusDAO {
     public List<Bus> obtenerTodos() throws SQLException {
         String sql = "SELECT * FROM bus";
         List<Bus> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 lista.add(mapear(rs));
             }
@@ -27,9 +25,21 @@ public class BusDAO {
 
     public Bus obtenerPorId(int id) throws SQLException {
         String sql = "SELECT * FROM bus WHERE id_bus = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapear(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    public Bus obtenerPorPlaca(String placa) throws SQLException {
+        String sql = "SELECT * FROM bus WHERE placa = ?";
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, placa);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return mapear(rs);
@@ -42,12 +52,27 @@ public class BusDAO {
     public List<Bus> obtenerPorSucursal(int idSucursal) throws SQLException {
         String sql = "SELECT * FROM bus WHERE id_sucursal_actual = ?";
         List<Bus> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idSucursal);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     lista.add(mapear(rs));
+                }
+            }
+        }
+        return lista;
+    }
+
+    public List<Bus> obtenerPorSucursalConViajesActivos(int idSucursal) throws SQLException {
+        String sql = "SELECT b.*, (SELECT COUNT(*) FROM viaje v WHERE v.id_bus = b.id_bus "
+                + "AND v.estado_operativo IN ('PROGRAMADO', 'EN_TRANSITO')) AS viajes_activos "
+                + "FROM bus b WHERE b.id_sucursal_actual = ?";
+        List<Bus> lista = new ArrayList<>();
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idSucursal);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapearConViajesActivos(rs));
                 }
             }
         }
@@ -59,8 +84,7 @@ public class BusDAO {
                 + "AND id_bus NOT IN (SELECT id_bus FROM viaje WHERE DATE(fecha_hora_salida_estimada) = ? "
                 + "AND estado_operativo IN ('PROGRAMADO', 'EN_TRANSITO'))";
         List<Bus> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idSucursal);
             ps.setString(2, fecha);
             try (ResultSet rs = ps.executeQuery()) {
@@ -74,8 +98,7 @@ public class BusDAO {
 
     public int crear(Bus b) throws SQLException {
         String sql = "INSERT INTO bus (placa, foto, marca, modelo, año_fabricacion, capacidad_pasajeros, kilometraje_actual, id_sucursal_origen, id_sucursal_actual) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, b.getPlaca());
             ps.setString(2, b.getFoto());
             ps.setString(3, b.getMarca());
@@ -97,8 +120,7 @@ public class BusDAO {
 
     public void actualizar(Bus b) throws SQLException {
         String sql = "UPDATE bus SET placa = ?, foto = ?, marca = ?, modelo = ?, año_fabricacion = ?, capacidad_pasajeros = ? WHERE id_bus = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, b.getPlaca());
             ps.setString(2, b.getFoto());
             ps.setString(3, b.getMarca());
@@ -112,8 +134,7 @@ public class BusDAO {
 
     public void desactivar(int id) throws SQLException {
         String sql = "UPDATE bus SET estado = FALSE WHERE id_bus = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
         }
@@ -121,8 +142,7 @@ public class BusDAO {
 
     public void actualizarKilometraje(int id, double km) throws SQLException {
         String sql = "UPDATE bus SET kilometraje_actual = ? WHERE id_bus = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDouble(1, km);
             ps.setInt(2, id);
             ps.executeUpdate();
@@ -131,8 +151,7 @@ public class BusDAO {
 
     public void actualizarDisponibilidad(int id, String disponibilidad) throws SQLException {
         String sql = "UPDATE bus SET disponibilidad = ? WHERE id_bus = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, disponibilidad);
             ps.setInt(2, id);
             ps.executeUpdate();
@@ -141,8 +160,7 @@ public class BusDAO {
 
     public void actualizarUbicacion(int idBus, int idNuevaSucursal) throws SQLException {
         String sql = "UPDATE bus SET id_sucursal_actual = ? WHERE id_bus = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idNuevaSucursal);
             ps.setInt(2, idBus);
             ps.executeUpdate();
@@ -151,11 +169,16 @@ public class BusDAO {
 
     public void activar(int id) throws SQLException {
         String sql = "UPDATE bus SET estado = TRUE WHERE id_bus = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
         }
+    }
+
+    private Bus mapearConViajesActivos(ResultSet rs) throws SQLException {
+        Bus b = mapear(rs);
+        b.setViajesActivos(rs.getInt("viajes_activos"));
+        return b;
     }
 
     private Bus mapear(ResultSet rs) throws SQLException {

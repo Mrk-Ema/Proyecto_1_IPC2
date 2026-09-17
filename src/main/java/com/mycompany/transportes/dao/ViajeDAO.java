@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -126,6 +125,19 @@ public class ViajeDAO {
             }
         }
         return lista;
+    }
+
+    public int contarViajesActivos(int idBus) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM viaje WHERE id_bus = ? AND estado_operativo IN ('PROGRAMADO', 'EN_TRANSITO')";
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idBus);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
     }
 
     public List<Viaje> obtenerPorFechas(String inicio, String fin) throws SQLException {

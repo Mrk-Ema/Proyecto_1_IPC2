@@ -14,6 +14,7 @@ public class Bus {
     private int idSucursalActual;
     private String disponibilidad;
     private boolean estado;
+    private int viajesActivos;
 
     public Bus() {
     }
@@ -123,5 +124,13 @@ public class Bus {
 
     public void setEstado(boolean estado) {
         this.estado = estado;
+    }
+
+    public int getViajesActivos() {
+        return viajesActivos;
+    }
+
+    public void setViajesActivos(int viajesActivos) {
+        this.viajesActivos = viajesActivos;
     }
 }
