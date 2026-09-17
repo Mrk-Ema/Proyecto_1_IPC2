@@ -123,6 +123,28 @@ public class ViajeDAO {
         return lista;
     }
 
+    public Viaje obtenerPorIdConDetalles(int id) throws SQLException {
+        String sql = "SELECT v.*, b.placa AS placa_bus, u.nombre_completo AS nombre_chofer, "
+                + "so.nombre AS nombre_origen, sd.nombre AS nombre_destino "
+                + "FROM viaje v "
+                + "INNER JOIN bus b ON v.id_bus = b.id_bus "
+                + "LEFT JOIN chofer c ON v.dpi_chofer = c.dpi "
+                + "LEFT JOIN usuario u ON c.dpi = u.dpi "
+                + "LEFT JOIN ruta r ON v.id_ruta = r.id_ruta "
+                + "LEFT JOIN sucursal so ON r.id_sucursal_origen = so.id_sucursal "
+                + "LEFT JOIN sucursal sd ON r.id_sucursal_destino = sd.id_sucursal "
+                + "WHERE v.id_viaje = ?";
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapearConDetalles(rs);
+                }
+            }
+        }
+        return null;
+    }
+
     public int contarViajesActivos(int idBus) throws SQLException {
         String sql = "SELECT COUNT(*) FROM viaje WHERE id_bus = ? AND estado_operativo IN ('PROGRAMADO', 'EN_TRANSITO')";
         try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {

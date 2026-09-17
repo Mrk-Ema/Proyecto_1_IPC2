@@ -3,6 +3,7 @@ package com.mycompany.transportes.servlets;
 import com.mycompany.transportes.dao.BusDAO;
 import com.mycompany.transportes.dao.ChoferDAO;
 import com.mycompany.transportes.dao.RutaDAO;
+import com.mycompany.transportes.modelo.Bus;
 import com.mycompany.transportes.modelo.Usuario;
 import com.mycompany.transportes.modelo.Viaje;
 import com.mycompany.transportes.servicio.ViajeService;
@@ -52,6 +53,14 @@ public class SvViaje extends HttpServlet {
                     request.setAttribute("viaje", viaje);
                     request.getRequestDispatcher("formularioViaje.jsp").forward(request, response);
                 }
+                case "formSalida" -> {
+                    prepararFormSalida(request);
+                    request.getRequestDispatcher("registrarSalida.jsp").forward(request, response);
+                }
+                case "formLlegada" -> {
+                    prepararFormLlegada(request);
+                    request.getRequestDispatcher("registrarLlegada.jsp").forward(request, response);
+                }
                 default ->
                     listar(request, response, null, null);
             }
@@ -86,6 +95,21 @@ public class SvViaje extends HttpServlet {
                     viajeService.eliminar(Integer.parseInt(request.getParameter("idViaje")));
                     listar(request, response, "Viaje eliminado.", null);
                 }
+                case "salida" -> {
+                    int idViaje = Integer.parseInt(request.getParameter("idViaje"));
+                    String fechaReal = formatearFecha(request.getParameter("fechaHoraSalidaReal"));
+                    double kmInicial = Double.parseDouble(request.getParameter("kmInicial"));
+                    viajeService.registrarSalida(idViaje, sesionAdmin(request).getIdSucursalOrigen(), fechaReal, kmInicial);
+                    listar(request, response, "Salida registrada. El viaje está en tránsito.", null);
+                }
+                case "llegada" -> {
+                    int idViaje = Integer.parseInt(request.getParameter("idViaje"));
+                    String fechaReal = formatearFecha(request.getParameter("fechaHoraLlegadaReal"));
+                    double kmFinal = Double.parseDouble(request.getParameter("kmFinal"));
+                    double gastoCombustible = Double.parseDouble(request.getParameter("gastoCombustible"));
+                    viajeService.registrarLlegada(idViaje, sesionAdmin(request).getIdSucursalOrigen(), fechaReal, kmFinal, gastoCombustible);
+                    listar(request, response, "Llegada registrada. El viaje está finalizado.", null);
+                }
                 default ->
                     listar(request, response, null, "Acción no válida.");
             }
@@ -99,11 +123,27 @@ public class SvViaje extends HttpServlet {
                     throw new ServletException("Error al preparar fomrulario", ex);
                 }
                 request.getRequestDispatcher("formularioViaje.jsp").forward(request, response);
+            } else if ("salida".equals(accion)) {
+                request.setAttribute("error", e.getMessage());
+                try {
+                    prepararFormSalida(request);
+                } catch (SQLException ex) {
+                    throw new ServletException("Error al preparar formulario", ex);
+                }
+                request.getRequestDispatcher("registrarSalida.jsp").forward(request, response);
+            } else if ("llegada".equals(accion)) {
+                request.setAttribute("error", e.getMessage());
+                try {
+                    prepararFormLlegada(request);
+                } catch (SQLException ex) {
+                    throw new ServletException("Error al preparar formulario", ex);
+                }
+                request.getRequestDispatcher("registrarLlegada.jsp").forward(request, response);
             } else {
                 listar(request, response, null, e.getMessage());
             }
-        } catch (SQLException e) {
-            throw new ServletException("Error al gestionar el viaje", e);
+        } catch (SQLException ex) {
+            System.getLogger(SvViaje.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
     }
 
@@ -161,5 +201,39 @@ public class SvViaje extends HttpServlet {
         }
         Usuario u = (Usuario) session.getAttribute("usuario");
         return (u != null && "ADMIN_SUCURSAL".equals(u.getRol())) ? u : null;
+    }
+
+    private void prepararFormSalida(HttpServletRequest request) throws SQLException {
+        int id = Integer.parseInt(request.getParameter("idViaje"));
+        Viaje viaje = viajeService.obtenerConDetalles(id);
+        if (viaje == null) {
+            throw new SQLException("El viaje no existe.");
+        }
+        request.setAttribute("viaje", viaje);
+        Bus bus = viaje.getIdBus() > 0 ? new BusDAO().obtenerPorId(viaje.getIdBus()) : null;
+        request.setAttribute("kmActual", bus != null ? bus.getKilometrajeActual() : 0.0);
+        String f = request.getParameter("fechaHoraSalidaReal");
+        if (f != null && !f.isBlank()) {
+            request.setAttribute("fechaActual", f.replace(" ", "T").substring(0, 16));
+        } else {
+            request.setAttribute("fechaActual", java.time.LocalDateTime.now().toString().substring(0, 16));
+        }
+    }
+
+    private void prepararFormLlegada(HttpServletRequest request) throws SQLException {
+        int id = Integer.parseInt(request.getParameter("idViaje"));
+        Viaje viaje = viajeService.obtenerConDetalles(id);
+        if (viaje == null) {
+            throw new SQLException("El viaje no existe.");
+        }
+        request.setAttribute("viaje", viaje);
+        Bus bus = viaje.getIdBus() > 0 ? new BusDAO().obtenerPorId(viaje.getIdBus()) : null;
+        request.setAttribute("kmBus", bus != null ? bus.getKilometrajeActual() : 0.0);
+        String f = request.getParameter("fechaHoraLlegadaReal");
+        if (f != null && !f.isBlank()) {
+            request.setAttribute("fechaActual", f.replace(" ", "T").substring(0, 16));
+        } else {
+            request.setAttribute("fechaActual", java.time.LocalDateTime.now().toString().substring(0, 16));
+        }
     }
 }

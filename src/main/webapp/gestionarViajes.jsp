@@ -54,6 +54,9 @@
                     <th>Salida estimada</th>
                     <th>Llegada estimada</th>
                     <th>Estado</th>
+                    <th>Salida real</th>
+                    <th>KM inicial</th>
+                    <th>Llegada real</th>
                     <th>Acciones</th>
                 </tr>
                 <%
@@ -70,9 +73,16 @@
                     <td><%= v.getFechaHoraSalidaEstimada()%></td>
                     <td><%= v.getFechaHoraLlegadaEstimada()%></td>
                     <td><%= mostrarEstado(v.getEstadoOperativo())%></td>
+                    <td><%= v.getFechaHoraSalidaReal() != null ? v.getFechaHoraSalidaReal() : "—"%></td>
+                    <td><%= v.getKilometrajeInicial() > 0 || v.getFechaHoraSalidaReal() != null ? v.getKilometrajeInicial() : "—"%></td>
+                    <td><%= v.getFechaHoraLlegadaReal() != null ? v.getFechaHoraLlegadaReal() : "—"%></td>
                     <td>
                         <% if ("PROGRAMADO".equals(v.getEstadoOperativo())) {%>
                         <a href="SvViaje?accion=formEditar&idViaje=<%= v.getIdViaje()%>">Editar</a>
+                        <a href="SvViaje?accion=formSalida&idViaje=<%= v.getIdViaje()%>">Registrar Salida</a>
+                        <% } %>
+                        <% if ("EN_TRANSITO".equals(v.getEstadoOperativo())) {%>
+                        <a href="SvViaje?accion=formLlegada&idViaje=<%= v.getIdViaje()%>">Registrar Llegada</a>
                         <% } %>
                         <% if ("PROGRAMADO".equals(v.getEstadoOperativo()) && "REGULAR".equals(v.getTipoViaje())) {%>
                         <form action="SvViaje" method="POST" style="display:inline;">

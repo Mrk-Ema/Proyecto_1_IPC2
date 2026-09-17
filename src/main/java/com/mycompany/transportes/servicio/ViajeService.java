@@ -3,6 +3,7 @@ package com.mycompany.transportes.servicio;
 import com.mycompany.transportes.dao.BoletoDAO;
 import com.mycompany.transportes.dao.BusDAO;
 import com.mycompany.transportes.dao.ChoferDAO;
+import com.mycompany.transportes.dao.ConfiguracionSistemaDAO;
 import com.mycompany.transportes.dao.ViajeDAO;
 import com.mycompany.transportes.modelo.Bus;
 import com.mycompany.transportes.modelo.Chofer;
@@ -24,6 +25,7 @@ public class ViajeService {
     private final BusDAO busDAO = new BusDAO();
     private final ChoferDAO choferDAO = new ChoferDAO();
     private final BoletoDAO boletoDAO = new BoletoDAO();
+    private final ConfiguracionSistemaDAO configDAO = new ConfiguracionSistemaDAO();
 
     public List<Viaje> listarPorSucursal(int idSucursal) throws SQLException {
         return viajeDAO.obtenerPorSucursalConDetalles(idSucursal);
@@ -102,7 +104,7 @@ public class ViajeService {
         }
     }
 
-   private void validarDisponibilidadEditar(Viaje nuevo, Viaje original, int idSucursal)
+    private void validarDisponibilidadEditar(Viaje nuevo, Viaje original, int idSucursal)
             throws SQLException, ValidacionException {
         String nuevaFecha = nuevo.getFechaHoraSalidaEstimada().substring(0, 10);
         String originalFecha = original.getFechaHoraSalidaEstimada().substring(0, 10);
@@ -124,6 +126,10 @@ public class ViajeService {
         }
     }
 
+    public Viaje obtenerConDetalles(int id) throws SQLException {
+        return viajeDAO.obtenerPorIdConDetalles(id);
+    }
+
     private LocalDateTime parsear(String fecha) throws ValidacionException {
         if (fecha == null || fecha.isEmpty()) {
             throw new ValidacionException("Las fechas de salida y llegada son obligatorias.");
@@ -139,6 +145,68 @@ public class ViajeService {
 
         public ValidacionException(String mensaje) {
             super(mensaje);
+        }
+    }
+
+    public void registrarSalida(int idViaje, int idSucursal, String fechaReal, double kmInicial)
+            throws SQLException, ValidacionException {
+        Viaje v = viajeDAO.obtenerPorId(idViaje);
+        if (v == null) {
+            throw new ValidacionException("El viaje no existe.");
+        }
+        if (!"PROGRAMADO".equals(v.getEstadoOperativo())) {
+            throw new ValidacionException("Solo se registra la salida de viajes programados.");
+        }
+        Bus bus = busDAO.obtenerPorId(v.getIdBus());
+        if (bus == null || bus.getIdSucursalActual() != idSucursal) {
+            throw new ValidacionException("El viaje no pertenece a tu sucursal.");
+        }
+        if (fechaReal == null || fechaReal.isBlank()) {
+            throw new ValidacionException("Indica la fecha y hora real de salida.");
+        }
+        if (kmInicial < 0) {
+            throw new ValidacionException("El kilometraje debe ser mayor o igual a cero.");
+        }
+        viajeDAO.registrarSalida(idViaje, fechaReal, kmInicial);
+        busDAO.actualizarDisponibilidad(v.getIdBus(), "Ocupado");
+        if (v.getDpiChofer() != null && !v.getDpiChofer().isBlank()) {
+            choferDAO.actualizarDisponibilidad(v.getDpiChofer(), "Ocupado");
+        }
+    }
+
+    public void registrarLlegada(int idViaje, int idSucursal, String fechaReal, double kmFinal, double gastoCombustible)
+            throws SQLException, ValidacionException {
+        Viaje v = viajeDAO.obtenerPorId(idViaje);
+        if (v == null) {
+            throw new ValidacionException("El viaje no existe.");
+        }
+        if (!"EN_TRANSITO".equals(v.getEstadoOperativo())) {
+            throw new ValidacionException("Solo se registra la llegada de viajes en tránsito.");
+        }
+        Bus bus = busDAO.obtenerPorId(v.getIdBus());
+        if (bus == null || bus.getIdSucursalActual() != idSucursal) {
+            throw new ValidacionException("El viaje no pertenece a tu sucursal.");
+        }
+        if (fechaReal == null || fechaReal.isBlank()) {
+            throw new ValidacionException("Indica la fecha y hora real de llegada.");
+        }
+        if (kmFinal < v.getKilometrajeInicial()) {
+            throw new ValidacionException("El kilometraje final no puede ser menor al inicial.");
+        }
+        if (gastoCombustible < 0) {
+            throw new ValidacionException("El gasto de combustible debe ser mayor o igual a cero.");
+        }
+        double monto = configDAO.obtener();
+        if (monto <= 0) {
+            monto = 1.50;
+        }
+        double depreciacion = Math.round((kmFinal - v.getKilometrajeInicial()) * monto * 100.0) / 100.0;
+
+        viajeDAO.registrarLlegada(idViaje, fechaReal, kmFinal, gastoCombustible, depreciacion);
+        busDAO.actualizarKilometraje(v.getIdBus(), kmFinal);
+        busDAO.actualizarDisponibilidad(v.getIdBus(), "Disponible");
+        if (v.getDpiChofer() != null && !v.getDpiChofer().isBlank()) {
+            choferDAO.actualizarDisponibilidad(v.getDpiChofer(), "Disponible");
         }
     }
 }
