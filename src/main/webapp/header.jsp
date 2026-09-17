@@ -25,6 +25,7 @@
     <% if (usuarioActual == null) { %>
     <a href="login.jsp">Iniciar Sesión</a>
     <% } else {%>
+     <a href="miPerfil.jsp">Mi Perfil</a>
     <span>Hola, <%= usuarioActual.getNombreCompleto()%></span>
     <% if (usuarioActual.getRol().equals("CLIENTE")) {%>
     <span> | Saldo: Q<%= String.format("%.2f", usuarioActual.getSaldoCartera())%></span>

@@ -13,13 +13,6 @@ public class UsuarioService {
     private final UsuarioDAO usuarioDAO = new UsuarioDAO();
     private final ChoferDAO choferDAO = new ChoferDAO();
 
-    public static class ValidacionException extends Exception {
-
-        public ValidacionException(String mensaje) {
-            super(mensaje);
-        }
-    }
-
     public Usuario autenticar(String correo, String password) throws SQLException {
         Usuario usuario = usuarioDAO.obtenerPorCorreo(correo);
         if (usuario != null && usuario.getPassword().equals(password) && usuario.isEstado()) {
@@ -59,6 +52,23 @@ public class UsuarioService {
                 throw e;
             }
         }
+    }
+
+    public void actualizarPerfil(String dpi, String nombreCompleto, String nit, String telefono, String direccion)
+            throws SQLException, ValidacionException {
+        if (nombreCompleto == null || nombreCompleto.isBlank()) {
+            throw new ValidacionException("El nombre completo es obligatorio.");
+        }
+        if (nit == null || nit.isBlank()) {
+            throw new ValidacionException("El NIT es obligatorio.");
+        }
+        if (telefono == null || telefono.isBlank()) {
+            throw new ValidacionException("El teléfono es obligatorio.");
+        }
+        if (direccion == null || direccion.isBlank()) {
+            throw new ValidacionException("La dirección es obligatoria.");
+        }
+        usuarioDAO.actualizarPerfil(dpi, nombreCompleto, nit, telefono, direccion);
     }
 
     private void validarDuplicados(String dpi, String correo) throws SQLException, ValidacionException {
@@ -116,5 +126,12 @@ public class UsuarioService {
 
     private boolean esVacio(String valor) {
         return valor == null || valor.trim().isEmpty();
+    }
+
+    public static class ValidacionException extends Exception {
+
+        public ValidacionException(String mensaje) {
+            super(mensaje);
+        }
     }
 }

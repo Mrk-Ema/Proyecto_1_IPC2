@@ -63,6 +63,24 @@ public class SvUsuario extends HttpServlet {
                         response.sendRedirect("home.jsp?recarga=ok");
                     }
                 }
+                case "editarPerfil" -> {
+                    String dpi = request.getParameter("dpi");
+                    String nombreCompleto = request.getParameter("nombreCompleto");
+                    String nit = request.getParameter("nit");
+                    String telefono = request.getParameter("telefono");
+                    String direccion = request.getParameter("direccion");
+                    usuarioService.actualizarPerfil(dpi, nombreCompleto, nit, telefono, direccion);
+                    HttpSession session = request.getSession(false);
+                    if (session != null) {
+                        Usuario u = (Usuario) session.getAttribute("usuario");
+                        u.setNombreCompleto(nombreCompleto);
+                        u.setNit(nit);
+                        u.setTelefono(telefono);
+                        u.setDireccion(direccion);
+                        session.setAttribute("usuario", u);
+                    }
+                    response.sendRedirect("miPerfil.jsp?exito=perfil_actualizado");
+                }
                 default -> {
                     Usuario nuevoCliente = crearUsuarioDesdeRequest(request, "CLIENTE");
                     usuarioService.registrarCliente(nuevoCliente);
@@ -79,6 +97,8 @@ public class SvUsuario extends HttpServlet {
                     "crearAdmiSucursal.jsp";
                 case "chofer" ->
                     "crearChofer.jsp";
+                case "editarPerfil" ->
+                    "miPerfil.jsp";
                 default ->
                     "registro.jsp";
             };

@@ -75,6 +75,27 @@ public class MantenimientoTallerDAO {
         return -1;
     }
 
+     public List<Mantenimiento> obtenerPorSucursalConPlaca(int idSucursal) throws SQLException {
+        String sql = "SELECT m.*, b.placa AS placa_bus "
+                + "FROM mantenimiento_taller m "
+                + "INNER JOIN bus b ON m.id_bus = b.id_bus "
+                + "WHERE b.id_sucursal_origen = ? "
+                + "ORDER BY m.fecha_mantenimiento DESC";
+        List<Mantenimiento> lista = new ArrayList<>();
+        try (Connection conn = Conexion.obtener();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idSucursal);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Mantenimiento m = mapear(rs);
+                    m.setPlaca(rs.getString("placa_bus"));
+                    lista.add(m);
+                }
+            }
+        }
+        return lista;
+    }
+    
     public double totalRepuestosPorBus(int idBus) throws SQLException {
         String sql = "SELECT COALESCE(SUM(monto_repuestos), 0) FROM mantenimiento_taller WHERE id_bus = ?";
         try (Connection conn = Conexion.obtener();

@@ -10,6 +10,7 @@ public class Mantenimiento {
     private double montoRepuestos;
     private Date fechaMantenimiento;
     private String descripcion;
+    private String placa;
 
     public Mantenimiento() {
     }
@@ -68,5 +69,13 @@ public class Mantenimiento {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public String getPlaca() {
+        return placa;
+    }
+
+    public void setPlaca(String placa) {
+        this.placa = placa;
     }
 }

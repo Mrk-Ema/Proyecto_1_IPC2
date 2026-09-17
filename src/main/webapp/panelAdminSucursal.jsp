@@ -20,7 +20,8 @@
             <a href="SvRuta">Gestionar Rutas</a> |
             <a href="SvViaje">Gestionar Viajes</a> |
             <a href="SvAlquiler?accion=pendientes">Alquileres por Confirmar</a> |
-            <a href="SvAlquiler?accion=pagados">Alquileres Pagados</a>
+            <a href="SvAlquiler?accion=pagados">Alquileres Pagados</a> |
+            <a href="SvMantenimiento">Gastos de Taller</a> 
         </div>
     </body>
 </html>
