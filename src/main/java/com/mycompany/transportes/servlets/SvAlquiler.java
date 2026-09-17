@@ -1,5 +1,7 @@
 package com.mycompany.transportes.servlets;
 
+import com.mycompany.transportes.dao.BusDAO;
+import com.mycompany.transportes.dao.ChoferDAO;
 import com.mycompany.transportes.modelo.AlquilerPrivado;
 import com.mycompany.transportes.modelo.Usuario;
 import com.mycompany.transportes.servicio.AlquilerService;
@@ -30,6 +32,12 @@ public class SvAlquiler extends HttpServlet {
         } else if ("pendientes".equals(accion)) {
             mostrarPendientes(request, response, null);
             return;
+        } else if ("pagados".equals(accion)) {
+            mostrarPagados(request, response, null);
+            return;
+        } else if ("formAsignar".equals(accion)) {
+            mostrarFormAsignar(request, response);
+            return;
         }
         request.getRequestDispatcher("alquilerPrivado.jsp").forward(request, response);
     }
@@ -47,6 +55,9 @@ public class SvAlquiler extends HttpServlet {
             return;
         } else if ("rechazar".equals(accion)) {
             rechazar(request, response);
+            return;
+        } else if ("asignar".equals(accion)) {
+            asignar(request, response);
             return;
         }
 
@@ -230,6 +241,92 @@ public class SvAlquiler extends HttpServlet {
         }
         request.setAttribute("mensaje", mensaje);
         request.getRequestDispatcher("alquileresPendientes.jsp").forward(request, response);
+    }
+
+    private Usuario sesionAdmin(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return null;
+        }
+        Usuario u = (Usuario) session.getAttribute("usuario");
+        return (u != null && "ADMIN_SUCURSAL".equals(u.getRol())) ? u : null;
+    }
+
+    private void mostrarPagados(HttpServletRequest request, HttpServletResponse response, String mensaje)
+            throws ServletException, IOException {
+        Usuario admin = sesionAdmin(request);
+        if (admin == null) {
+            response.sendRedirect("login.jsp?error=acceso_denegado");
+            return;
+        }
+        try {
+            request.setAttribute("pagados", alquilerService.listarPagadosSinViaje());
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("pagados", new java.util.ArrayList<>());
+        }
+        request.setAttribute("mensaje", mensaje);
+        request.getRequestDispatcher("alquileresPagados.jsp").forward(request, response);
+    }
+
+    private void mostrarFormAsignar(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        Usuario admin = sesionAdmin(request);
+        if (admin == null) {
+            response.sendRedirect("login.jsp?error=acceso_denegado");
+            return;
+        }
+        try {
+            int idAlquiler = Integer.parseInt(request.getParameter("idAlquiler"));
+            AlquilerPrivado a = alquilerService.buscarPorId(idAlquiler);
+            if (a == null) {
+                mostrarPagados(request, response, "El alquiler no existe.");
+                return;
+            }
+            if (!"PAGADO".equals(a.getEstadoPago()) || a.getIdViaje() > 0) {
+                mostrarPagados(request, response, "Este alquiler ya no está disponible para asignación.");
+                return;
+            }
+            String fechaSalida = a.getFechaSalida().substring(0, 10);
+            request.setAttribute("alquiler", a);
+            request.setAttribute("buses", new BusDAO().obtenerDisponibles(admin.getIdSucursalOrigen(), fechaSalida));
+            request.setAttribute("choferes", new ChoferDAO().obtenerDisponibles(admin.getIdSucursalOrigen(), fechaSalida));
+            request.getRequestDispatcher("asignarAlquiler.jsp").forward(request, response);
+        } catch (NumberFormatException e) {
+            mostrarPagados(request, response, "Identificador de alquiler inválido.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarPagados(request, response, "Error al preparar la asignación.");
+        }
+    }
+
+    private void asignar(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        Usuario admin = sesionAdmin(request);
+        if (admin == null) {
+            response.sendRedirect("login.jsp?error=acceso_denegado");
+            return;
+        }
+        try {
+            int idAlquiler = Integer.parseInt(request.getParameter("idAlquiler"));
+            int idBus = Integer.parseInt(request.getParameter("idBus"));
+            String dpiChofer = request.getParameter("dpiChofer");
+            if (dpiChofer == null || dpiChofer.isBlank()) {
+                request.setAttribute("error", "Debe seleccionar un chofer.");
+                mostrarFormAsignar(request, response);
+                return;
+            }
+            int idViaje = alquilerService.asignarBusYChofer(idAlquiler, idBus, dpiChofer, admin.getIdSucursalOrigen());
+            mostrarPagados(request, response, "Viaje #" + idViaje + " asignado al alquiler #" + idAlquiler + " con éxito.");
+        } catch (NumberFormatException e) {
+            mostrarPagados(request, response, "Valores inválidos en la asignación.");
+        } catch (IllegalArgumentException e) {
+            request.setAttribute("error", e.getMessage());
+            mostrarFormAsignar(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarPagados(request, response, "Error al asignar bus y chofer.");
+        }
     }
 
     private void enviarError(HttpServletRequest request, HttpServletResponse response, String mensaje)

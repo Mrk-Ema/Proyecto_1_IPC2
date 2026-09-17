@@ -35,7 +35,6 @@ public class ChoferDAO {
         return null;
     }
 
-
     public List<Chofer> obtenerPorSucursalConDetalles(int idSucursal) throws SQLException {
         String sql = "SELECT c.*, u.nombre_completo, u.telefono, u.direccion, u.estado, "
                 + "(SELECT COUNT(*) FROM viaje v WHERE v.dpi_chofer = c.dpi "
@@ -55,7 +54,8 @@ public class ChoferDAO {
     }
 
     public List<Chofer> obtenerDisponibles(int idSucursal, String fecha) throws SQLException {
-        String sql = "SELECT c.* FROM chofer c "
+        String sql = "SELECT c.*, u.nombre_completo, u.telefono, u.direccion, u.estado "
+                + "FROM chofer c "
                 + "INNER JOIN usuario u ON c.dpi = u.dpi "
                 + "WHERE u.id_sucursal_origen = ? AND u.estado = TRUE AND c.disponibilidad = 'Disponible' "
                 + "AND c.dpi NOT IN (SELECT dpi_chofer FROM viaje WHERE DATE(fecha_hora_salida_estimada) = ? "
@@ -66,7 +66,12 @@ public class ChoferDAO {
             ps.setString(2, fecha);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    lista.add(mapear(rs));
+                    Chofer c = mapear(rs);
+                    c.setNombreCompleto(rs.getString("nombre_completo"));
+                    c.setTelefono(rs.getString("telefono"));
+                    c.setDireccion(rs.getString("direccion"));
+                    c.setEstado(rs.getBoolean("estado"));
+                    lista.add(c);
                 }
             }
         }

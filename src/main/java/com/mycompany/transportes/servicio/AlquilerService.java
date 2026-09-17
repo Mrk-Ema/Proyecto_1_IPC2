@@ -1,5 +1,11 @@
 package com.mycompany.transportes.servicio;
 
+import com.mycompany.transportes.dao.BusDAO;
+import com.mycompany.transportes.dao.ChoferDAO;
+import com.mycompany.transportes.dao.ViajeDAO;
+import com.mycompany.transportes.modelo.Bus;
+import com.mycompany.transportes.modelo.Chofer;
+import com.mycompany.transportes.modelo.Viaje;
 import com.mycompany.transportes.conexion.Conexion;
 import com.mycompany.transportes.dao.AlquilerPrivadoDAO;
 import com.mycompany.transportes.dao.UsuarioDAO;
@@ -22,6 +28,9 @@ public class AlquilerService {
     private final AlquilerPrivadoDAO alquilerDAO = new AlquilerPrivadoDAO();
 
     private final UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private final BusDAO busDAO = new BusDAO();
+    private final ChoferDAO choferDAO = new ChoferDAO();
+    private final ViajeDAO viajeDAO = new ViajeDAO();
 
     public enum EstadoPago {
         OK, CONTRASENA_INCORRECTA, SALDO_INSUFICIENTE, NO_CONFIRMADO, NO_ENCONTRADO, ERROR_SISTEMA
@@ -128,5 +137,73 @@ public class AlquilerService {
 
     public void rechazarAlquiler(int id) throws SQLException {
         alquilerDAO.rechazar(id);
+    }
+
+    public AlquilerPrivado buscarPorId(int id) throws SQLException {
+        return alquilerDAO.obtenerPorId(id);
+    }
+
+    public List<AlquilerPrivado> listarPagadosSinViaje() throws SQLException {
+        return alquilerDAO.obtenerPagadosSinViaje();
+    }
+
+    public int asignarBusYChofer(int idAlquiler, int idBus, String dpiChofer, int idSucursal)
+            throws SQLException, IllegalArgumentException {
+        AlquilerPrivado a = alquilerDAO.obtenerPorId(idAlquiler);
+        if (a == null) {
+            throw new IllegalArgumentException("El alquiler no existe.");
+        }
+        if (!"PAGADO".equals(a.getEstadoPago())) {
+            throw new IllegalArgumentException("Solo se pueden asignar recursos a alquileres pagados.");
+        }
+        if (a.getIdViaje() > 0) {
+            throw new IllegalArgumentException("Este alquiler ya tiene un viaje asignado.");
+        }
+        if (a.getFechaRetorno() == null || a.getFechaRetorno().isBlank()) {
+            throw new IllegalArgumentException("El alquiler no tiene fecha de retorno.");
+        }
+
+        String fechaSalida = a.getFechaSalida().substring(0, 10);
+
+        boolean busDisponible = busDAO.obtenerDisponibles(idSucursal, fechaSalida).stream()
+                .anyMatch(b -> b.getIdBus() == idBus);
+        if (!busDisponible) {
+            throw new IllegalArgumentException("El bus seleccionado no está disponible para la fecha de salida.");
+        }
+        boolean choferDisponible = choferDAO.obtenerDisponibles(idSucursal, fechaSalida).stream()
+                .anyMatch(c -> c.getDpi().equals(dpiChofer));
+        if (!choferDisponible) {
+            throw new IllegalArgumentException("El chofer seleccionado no está disponible para la fecha de salida.");
+        }
+
+        Chofer chofer = choferDAO.obtenerPorDpi(dpiChofer);
+        if (chofer == null) {
+            throw new IllegalArgumentException("El chofer seleccionado no existe.");
+        }
+        double salario = Math.round(chofer.getSalarioBaseViaje() * 1.15 * 100.0) / 100.0;
+
+        Viaje v = new Viaje();
+        v.setIdBus(idBus);
+        v.setDpiChofer(dpiChofer);
+        v.setIdRuta(0);
+        v.setTipoViaje("ALQUILER_PRIVADO");
+        v.setFechaHoraSalidaEstimada(a.getFechaSalida());
+        v.setFechaHoraLlegadaEstimada(a.getFechaRetorno());
+
+        try (Connection conn = Conexion.obtener()) {
+            conn.setAutoCommit(false);
+            try {
+                int idViaje = viajeDAO.crear(conn, v);
+                if (idViaje <= 0) {
+                    throw new SQLException("No se pudo crear el viaje.");
+                }
+                alquilerDAO.asignarRecursos(conn, idAlquiler, idViaje, salario);
+                conn.commit();
+                return idViaje;
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+        }
     }
 }

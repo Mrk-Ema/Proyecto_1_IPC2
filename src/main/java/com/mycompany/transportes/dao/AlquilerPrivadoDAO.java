@@ -119,6 +119,32 @@ public class AlquilerPrivadoDAO {
         }
     }
 
+    public List<AlquilerPrivado> obtenerPagadosSinViaje() throws SQLException {
+        String sql = "SELECT * FROM alquiler_privado "
+                + "WHERE estado_pago = 'PAGADO' AND id_viaje IS NULL "
+                + "ORDER BY fecha_salida ASC";
+        List<AlquilerPrivado> lista = new ArrayList<>();
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapear(rs));
+                }
+            }
+        }
+        return lista;
+    }
+
+    public void asignarRecursos(Connection conn, int idAlquiler, int idViaje, double salarioChofer) throws SQLException {
+        String sql = "UPDATE alquiler_privado SET id_viaje = ?, salario_chofer_calculado = ? "
+                + "WHERE id_alquiler = ? AND estado_pago = 'PAGADO' AND id_viaje IS NULL";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idViaje);
+            ps.setDouble(2, salarioChofer);
+            ps.setInt(3, idAlquiler);
+            ps.executeUpdate();
+        }
+    }
+
     private AlquilerPrivado mapear(ResultSet rs) throws SQLException {
         AlquilerPrivado a = new AlquilerPrivado();
         a.setIdAlquiler(rs.getInt("id_alquiler"));

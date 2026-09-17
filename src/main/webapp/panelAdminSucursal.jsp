@@ -19,7 +19,8 @@
             <a href="SvBus">Gestionar Buses</a> |
             <a href="SvRuta">Gestionar Rutas</a> |
             <a href="SvViaje">Gestionar Viajes</a> |
-            <a href="SvAlquiler?accion=pendientes">Alquileres por Confirmar</a>
+            <a href="SvAlquiler?accion=pendientes">Alquileres por Confirmar</a> |
+            <a href="SvAlquiler?accion=pagados">Alquileres Pagados</a>
         </div>
     </body>
 </html>

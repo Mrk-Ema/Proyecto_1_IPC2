@@ -203,6 +203,29 @@ public class ViajeDAO {
         return -1;
     }
 
+    public int crear(Connection conn, Viaje v) throws SQLException {
+        String sql = "INSERT INTO viaje (id_bus, dpi_chofer, id_ruta, tipo_viaje, fecha_hora_salida_estimada, fecha_hora_llegada_estimada, estado_operativo) VALUES (?, ?, ?, ?, ?, ?, 'PROGRAMADO')";
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, v.getIdBus());
+            ps.setString(2, v.getDpiChofer());
+            if (v.getIdRuta() > 0) {
+                ps.setInt(3, v.getIdRuta());
+            } else {
+                ps.setNull(3, java.sql.Types.INTEGER);
+            }
+            ps.setString(4, v.getTipoViaje());
+            ps.setString(5, v.getFechaHoraSalidaEstimada());
+            ps.setString(6, v.getFechaHoraLlegadaEstimada());
+            ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    return keys.getInt(1);
+                }
+            }
+        }
+        return -1;
+    }
+
     public void actualizar(Viaje v) throws SQLException {
         String sql = "UPDATE viaje SET id_bus = ?, dpi_chofer = ?, id_ruta = ?, fecha_hora_salida_estimada = ?, fecha_hora_llegada_estimada = ? WHERE id_viaje = ?";
         try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
