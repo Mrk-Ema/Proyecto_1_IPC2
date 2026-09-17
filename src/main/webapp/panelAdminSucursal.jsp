@@ -17,6 +17,7 @@
             <h1>Panel de Administrador de sucursal</h1>
             <a href="SvChofer">Gestionar Choferes</a> |
             <a href="SvBus">Gestionar Buses</a> |
+            <a href="SvRuta">Gestionar Rutas</a> |
             <a href="SvAlquiler?accion=pendientes">Alquileres por Confirmar</a>
         </div>
     </body>

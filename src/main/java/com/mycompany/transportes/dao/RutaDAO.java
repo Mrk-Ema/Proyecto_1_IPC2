@@ -15,9 +15,7 @@ public class RutaDAO {
     public List<Ruta> obtenerTodas() throws SQLException {
         String sql = "SELECT * FROM ruta";
         List<Ruta> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 lista.add(mapear(rs));
             }
@@ -27,8 +25,7 @@ public class RutaDAO {
 
     public Ruta obtenerPorId(int id) throws SQLException {
         String sql = "SELECT * FROM ruta WHERE id_ruta = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -42,8 +39,7 @@ public class RutaDAO {
     public List<Ruta> obtenerPorSucursalOrigen(int idSucursal) throws SQLException {
         String sql = "SELECT * FROM ruta WHERE id_sucursal_origen = ?";
         List<Ruta> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idSucursal);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -54,12 +50,42 @@ public class RutaDAO {
         return lista;
     }
 
+    public List<Ruta> obtenerPorSucursalConNombres(int idSucursal) throws SQLException {
+        String sql = "SELECT r.*, so.nombre AS nombre_origen, sd.nombre AS nombre_destino, "
+                + "(SELECT COUNT(*) FROM viaje v WHERE v.id_ruta = r.id_ruta) AS viajes_activos "
+                + "FROM ruta r INNER JOIN sucursal so ON r.id_sucursal_origen = so.id_sucursal "
+                + "INNER JOIN sucursal sd ON r.id_sucursal_destino = sd.id_sucursal "
+                + "WHERE r.id_sucursal_origen = ?";
+        List<Ruta> lista = new ArrayList<>();
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idSucursal);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapearConNombres(rs));
+                }
+            }
+        }
+        return lista;
+    }
+
+    public boolean existeRuta(int idOrigen, int idDestino) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM ruta WHERE id_sucursal_origen = ? AND id_sucursal_destino = ?";
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idOrigen);
+            ps.setInt(2, idDestino);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
     public List<Ruta> obtenerDisponibles() throws SQLException {
         String sql = "SELECT * FROM ruta WHERE estado = TRUE";
         List<Ruta> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 lista.add(mapear(rs));
             }
@@ -69,8 +95,7 @@ public class RutaDAO {
 
     public int crear(Ruta r) throws SQLException {
         String sql = "INSERT INTO ruta (id_sucursal_origen, id_sucursal_destino, distancia_km, precio_boleto, estado) VALUES (?, ?, ?, ?, TRUE)";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, r.getIdSucursalOrigen());
             ps.setInt(2, r.getIdSucursalDestino());
             ps.setDouble(3, r.getDistanciaKm());
@@ -87,8 +112,7 @@ public class RutaDAO {
 
     public void actualizar(Ruta r) throws SQLException {
         String sql = "UPDATE ruta SET id_sucursal_origen = ?, id_sucursal_destino = ?, distancia_km = ?, precio_boleto = ? WHERE id_ruta = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, r.getIdSucursalOrigen());
             ps.setInt(2, r.getIdSucursalDestino());
             ps.setDouble(3, r.getDistanciaKm());
@@ -100,11 +124,18 @@ public class RutaDAO {
 
     public void eliminar(int id) throws SQLException {
         String sql = "DELETE FROM ruta WHERE id_ruta = ? AND id_ruta NOT IN (SELECT DISTINCT id_ruta FROM viaje WHERE id_ruta IS NOT NULL)";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
         }
+    }
+
+    private Ruta mapearConNombres(ResultSet rs) throws SQLException {
+        Ruta r = mapear(rs);
+        r.setNombreOrigen(rs.getString("nombre_origen"));
+        r.setNombreDestino(rs.getString("nombre_destino"));
+        r.setViajesActivos(rs.getInt("viajes_activos"));
+        return r;
     }
 
     private Ruta mapear(ResultSet rs) throws SQLException {

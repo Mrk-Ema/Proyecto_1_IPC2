@@ -153,6 +153,19 @@ public class ViajeDAO {
         return 0;
     }
 
+    public int contarViajesDeRuta(int idRuta) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM viaje WHERE id_ruta = ?";
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idRuta);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
     public List<Viaje> obtenerPorFechas(String inicio, String fin) throws SQLException {
         String sql = "SELECT * FROM viaje WHERE fecha_hora_salida_estimada BETWEEN ? AND ?";
         List<Viaje> lista = new ArrayList<>();

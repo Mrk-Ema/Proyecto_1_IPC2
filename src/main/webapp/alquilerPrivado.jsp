@@ -44,7 +44,7 @@
                     <input type="datetime-local" name="fechaRetorno" required>
                 </label><br>
                 <label>Número de pasajeros:
-                    <input type="number" name="numeroPasajeros" min="1" max="45" required>
+                    <input type="number" name="numeroPasajeros" min="1" max="100" required>
                 </label><br><br>
                 <button type="submit">Solicitar y ver precio estimado</button>
             </form>

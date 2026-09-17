@@ -8,6 +8,9 @@ public class Ruta {
     private double distanciaKm;
     private double precioBoleto;
     private boolean estado;
+    private String nombreOrigen;
+    private String nombreDestino;
+    private int viajesActivos;
 
     public Ruta() {
     }
@@ -65,5 +68,30 @@ public class Ruta {
 
     public void setEstado(boolean estado) {
         this.estado = estado;
+    }
+
+    public String getNombreOrigen() {
+        return nombreOrigen;
+    }
+
+    public void setNombreOrigen(String nombreOrigen) {
+        this.nombreOrigen = nombreOrigen;
+    }
+
+    public String getNombreDestino() {
+        return nombreDestino;
+    }
+
+    public void setNombreDestino(String nombreDestino) {
+        this.nombreDestino = nombreDestino;
+
+    }
+
+    public int getViajesActivos() {
+        return viajesActivos;
+    }
+
+    public void setViajesActivos(int viajesActivos) {
+        this.viajesActivos = viajesActivos;
     }
 }
