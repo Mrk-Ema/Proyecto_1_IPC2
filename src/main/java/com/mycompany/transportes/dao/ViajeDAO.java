@@ -140,6 +140,19 @@ public class ViajeDAO {
         return 0;
     }
 
+    public int contarViajesActivosDeChofer(String dpi) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM viaje WHERE dpi_chofer = ? AND estado_operativo IN ('PROGRAMADO', 'EN_TRANSITO')";
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, dpi);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
     public List<Viaje> obtenerPorFechas(String inicio, String fin) throws SQLException {
         String sql = "SELECT * FROM viaje WHERE fecha_hora_salida_estimada BETWEEN ? AND ?";
         List<Viaje> lista = new ArrayList<>();

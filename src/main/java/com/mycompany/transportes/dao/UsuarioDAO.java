@@ -139,6 +139,24 @@ public class UsuarioDAO {
         }
     }
 
+    public void activar(String dpi) throws SQLException {
+        String sql = "UPDATE usuario SET estado = TRUE WHERE dpi = ?";
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, dpi);
+            ps.executeUpdate();
+        }
+    }
+
+    public void actualizarTelefonoDireccion(String dpi, String telefono, String direccion) throws SQLException {
+        String sql = "UPDATE usuario SET telefono = ?, direccion = ? WHERE dpi = ?";
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, telefono);
+            ps.setString(2, direccion);
+            ps.setString(3, dpi);
+            ps.executeUpdate();
+        }
+    }
+
     private Usuario mapear(ResultSet rs) throws SQLException {
         Usuario u = new Usuario();
         u.setDpi(rs.getString("dpi"));

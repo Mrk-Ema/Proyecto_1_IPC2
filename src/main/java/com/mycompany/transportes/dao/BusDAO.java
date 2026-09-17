@@ -49,20 +49,6 @@ public class BusDAO {
         return null;
     }
 
-    public List<Bus> obtenerPorSucursal(int idSucursal) throws SQLException {
-        String sql = "SELECT * FROM bus WHERE id_sucursal_actual = ?";
-        List<Bus> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, idSucursal);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    lista.add(mapear(rs));
-                }
-            }
-        }
-        return lista;
-    }
-
     public List<Bus> obtenerPorSucursalConViajesActivos(int idSucursal) throws SQLException {
         String sql = "SELECT b.*, (SELECT COUNT(*) FROM viaje v WHERE v.id_bus = b.id_bus "
                 + "AND v.estado_operativo IN ('PROGRAMADO', 'EN_TRANSITO')) AS viajes_activos "

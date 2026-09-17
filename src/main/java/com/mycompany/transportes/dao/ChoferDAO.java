@@ -14,20 +14,17 @@ public class ChoferDAO {
     public List<Chofer> obtenerTodos() throws SQLException {
         String sql = "SELECT * FROM chofer";
         List<Chofer> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 lista.add(mapear(rs));
             }
         }
         return lista;
-    }  
+    }
 
     public Chofer obtenerPorDpi(String dpi) throws SQLException {
         String sql = "SELECT * FROM chofer WHERE dpi = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, dpi);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -38,15 +35,19 @@ public class ChoferDAO {
         return null;
     }
 
-    public List<Chofer> obtenerPorSucursal(int idSucursal) throws SQLException {
-        String sql = "SELECT c.* FROM chofer c INNER JOIN usuario u ON c.dpi = u.dpi WHERE u.id_sucursal_origen = ?";
+
+    public List<Chofer> obtenerPorSucursalConDetalles(int idSucursal) throws SQLException {
+        String sql = "SELECT c.*, u.nombre_completo, u.telefono, u.direccion, u.estado, "
+                + "(SELECT COUNT(*) FROM viaje v WHERE v.dpi_chofer = c.dpi "
+                + "AND v.estado_operativo IN ('PROGRAMADO', 'EN_TRANSITO')) AS viajes_activos "
+                + "FROM chofer c INNER JOIN usuario u ON c.dpi = u.dpi "
+                + "WHERE u.id_sucursal_origen = ?";
         List<Chofer> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idSucursal);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    lista.add(mapear(rs));
+                    lista.add(mapearConDetalles(rs));
                 }
             }
         }
@@ -60,8 +61,7 @@ public class ChoferDAO {
                 + "AND c.dpi NOT IN (SELECT dpi_chofer FROM viaje WHERE DATE(fecha_hora_salida_estimada) = ? "
                 + "AND estado_operativo IN ('PROGRAMADO', 'EN_TRANSITO'))";
         List<Chofer> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idSucursal);
             ps.setString(2, fecha);
             try (ResultSet rs = ps.executeQuery()) {
@@ -94,8 +94,7 @@ public class ChoferDAO {
 
     public void actualizar(Chofer c) throws SQLException {
         String sql = "UPDATE chofer SET foto = ?, num_licencia = ?, tipo_licencia = ?, fecha_vencimiento_licencia = ?, salario_base_viaje = ? WHERE dpi = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, c.getFoto());
             ps.setString(2, c.getNumLicencia());
             ps.setString(3, c.getTipoLicencia());
@@ -108,8 +107,7 @@ public class ChoferDAO {
 
     public void actualizarDisponibilidad(String dpi, String disponibilidad) throws SQLException {
         String sql = "UPDATE chofer SET disponibilidad = ? WHERE dpi = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, disponibilidad);
             ps.setString(2, dpi);
             ps.executeUpdate();
@@ -125,6 +123,16 @@ public class ChoferDAO {
         c.setFechaVencimientoLicencia(rs.getDate("fecha_vencimiento_licencia"));
         c.setSalarioBaseViaje(rs.getDouble("salario_base_viaje"));
         c.setDisponibilidad(rs.getString("disponibilidad"));
+        return c;
+    }
+
+    private Chofer mapearConDetalles(ResultSet rs) throws SQLException {
+        Chofer c = mapear(rs);
+        c.setNombreCompleto(rs.getString("nombre_completo"));
+        c.setTelefono(rs.getString("telefono"));
+        c.setDireccion(rs.getString("direccion"));
+        c.setEstado(rs.getBoolean("estado"));
+        c.setViajesActivos(rs.getInt("viajes_activos"));
         return c;
     }
 }
