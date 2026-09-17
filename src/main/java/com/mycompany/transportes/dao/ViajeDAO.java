@@ -99,28 +99,24 @@ public class ViajeDAO {
         return null;
     }
 
-    public List<Viaje> obtenerDisponibles(String fecha) throws SQLException {
-        String sql = "SELECT * FROM viaje WHERE tipo_viaje = 'REGULAR' AND estado_operativo = 'PROGRAMADO' AND DATE(fecha_hora_salida_estimada) = ?";
-        List<Viaje> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, fecha);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    lista.add(mapear(rs));
-                }
-            }
-        }
-        return lista;
-    }
-
-    public List<Viaje> obtenerPorSucursal(int idSucursal) throws SQLException {
-        String sql = "SELECT v.* FROM viaje v INNER JOIN bus b ON v.id_bus = b.id_bus WHERE b.id_sucursal = ?";
+    public List<Viaje> obtenerPorSucursalConDetalles(int idSucursal) throws SQLException {
+        String sql = "SELECT v.*, b.placa AS placa_bus, u.nombre_completo AS nombre_chofer, "
+                + "so.nombre AS nombre_origen, sd.nombre AS nombre_destino "
+                + "FROM viaje v "
+                + "INNER JOIN bus b ON v.id_bus = b.id_bus "
+                + "LEFT JOIN chofer c ON v.dpi_chofer = c.dpi "
+                + "LEFT JOIN usuario u ON c.dpi = u.dpi "
+                + "LEFT JOIN ruta r ON v.id_ruta = r.id_ruta "
+                + "LEFT JOIN sucursal so ON r.id_sucursal_origen = so.id_sucursal "
+                + "LEFT JOIN sucursal sd ON r.id_sucursal_destino = sd.id_sucursal "
+                + "WHERE b.id_sucursal_actual = ? "
+                + "ORDER BY v.fecha_hora_salida_estimada DESC";
         List<Viaje> lista = new ArrayList<>();
         try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idSucursal);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    lista.add(mapear(rs));
+                    lista.add(mapearConDetalles(rs));
                 }
             }
         }
@@ -269,6 +265,16 @@ public class ViajeDAO {
             ps.setInt(1, id);
             ps.executeUpdate();
         }
+    }
+
+    private Viaje mapearConDetalles(ResultSet rs) throws SQLException {
+        Viaje v = mapear(rs);
+        v.setPlacaBus(rs.getString("placa_bus"));
+        v.setNombreChofer(rs.getString("nombre_chofer"));
+        String origen = rs.getString("nombre_origen");
+        String destino = rs.getString("nombre_destino");
+        v.setNombreRuta(origen != null && destino != null ? origen + " → " + destino : null);
+        return v;
     }
 
     private Viaje mapear(ResultSet rs) throws SQLException {

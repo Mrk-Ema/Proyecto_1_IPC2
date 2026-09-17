@@ -16,6 +16,9 @@ public class Viaje {
     private double gastoCombustible;
     private double montoDepreciacion;
     private String estadoOperativo;
+    private String placaBus;
+    private String nombreChofer;
+    private String nombreRuta;
 
     public Viaje() {
     }
@@ -137,5 +140,29 @@ public class Viaje {
 
     public void setEstadoOperativo(String estadoOperativo) {
         this.estadoOperativo = estadoOperativo;
+    }
+
+    public String getPlacaBus() {
+        return placaBus;
+    }
+
+    public void setPlacaBus(String placaBus) {
+        this.placaBus = placaBus;
+    }
+
+    public String getNombreChofer() {
+        return nombreChofer;
+    }
+
+    public void setNombreChofer(String nombreChofer) {
+        this.nombreChofer = nombreChofer;
+    }
+
+    public String getNombreRuta() {
+        return nombreRuta;
+    }
+
+    public void setNombreRuta(String nombreRuta) {
+        this.nombreRuta = nombreRuta;
     }
 }

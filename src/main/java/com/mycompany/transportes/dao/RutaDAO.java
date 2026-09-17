@@ -56,13 +56,23 @@ public class RutaDAO {
         }
         return false;
     }
-
-    public List<Ruta> obtenerDisponibles() throws SQLException {
-        String sql = "SELECT * FROM ruta WHERE estado = TRUE";
+    
+    public List<Ruta> obtenerDisponiblesConNombres(int idSucursal) throws SQLException {
+        String sql = "SELECT r.*, so.nombre AS nombre_origen, sd.nombre AS nombre_destino "
+                + "FROM ruta r INNER JOIN sucursal so ON r.id_sucursal_origen = so.id_sucursal "
+                + "INNER JOIN sucursal sd ON r.id_sucursal_destino = sd.id_sucursal "
+                + "WHERE r.id_sucursal_origen = ? AND r.estado = TRUE "
+                + "ORDER BY r.id_ruta";
         List<Ruta> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                lista.add(mapear(rs));
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idSucursal);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Ruta r = mapear(rs);
+                    r.setNombreOrigen(rs.getString("nombre_origen"));
+                    r.setNombreDestino(rs.getString("nombre_destino"));
+                    lista.add(r);
+                }
             }
         }
         return lista;
