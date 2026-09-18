@@ -143,7 +143,7 @@ public class SvViaje extends HttpServlet {
                 listar(request, response, null, e.getMessage());
             }
         } catch (SQLException ex) {
-            System.getLogger(SvViaje.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            throw new ServletException("Error al procesar la solicitud", ex);
         }
     }
 

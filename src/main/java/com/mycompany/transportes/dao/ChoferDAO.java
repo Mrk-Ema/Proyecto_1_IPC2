@@ -23,12 +23,20 @@ public class ChoferDAO {
     }
 
     public Chofer obtenerPorDpi(String dpi) throws SQLException {
-        String sql = "SELECT * FROM chofer WHERE dpi = ?";
+        String sql = "SELECT c.*, u.nombre_completo, u.telefono, u.direccion, u.estado "
+                + "FROM chofer c "
+                + "INNER JOIN usuario u ON c.dpi = u.dpi "
+                + "WHERE c.dpi = ?";
         try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, dpi);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return mapear(rs);
+                    Chofer c = mapear(rs);
+                    c.setNombreCompleto(rs.getString("nombre_completo"));
+                    c.setTelefono(rs.getString("telefono"));
+                    c.setDireccion(rs.getString("direccion"));
+                    c.setEstado(rs.getBoolean("estado"));
+                    return c;
                 }
             }
         }

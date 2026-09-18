@@ -15,8 +15,11 @@
         <%@ include file="header.jsp" %>
 
         <div class="contenido">
-             <h1>Panel de Administrador del Sistema</h1>
-              <a href="crearAdmiSucursal.jsp">Crear Admin de Sucursal</a>
+            <h1>Panel de Administrador del Sistema</h1>
+            <a href="SvSucursal">Gestionar Sucursales</a> |
+            <a href="SvAdminSistema">Gestionar Admins de Sucursal</a> |
+            <a href="SvAdminSistema?accion=usuarios">Gestionar Usuarios</a> |
+            <a href="SvAdminSistema?accion=formConfig">Configuración</a>
         </div>
 
     </body>

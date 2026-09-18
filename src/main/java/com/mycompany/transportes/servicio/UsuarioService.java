@@ -7,6 +7,7 @@ import com.mycompany.transportes.modelo.Chofer;
 import com.mycompany.transportes.modelo.Usuario;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 public class UsuarioService {
 
@@ -52,6 +53,59 @@ public class UsuarioService {
                 throw e;
             }
         }
+    }
+
+    public Usuario obtenerPorDpi(String dpi) throws SQLException {
+        return usuarioDAO.obtenerPorDpi(dpi);
+    }
+
+    public List<Usuario> listarAdminsSucursal() throws SQLException {
+        return usuarioDAO.obtenerPorRol("ADMIN_SUCURSAL");
+    }
+
+    public void actualizarAdminSucursal(Usuario u) throws SQLException, ValidacionException {
+        if (esVacio(u.getDpi()) || esVacio(u.getNombreCompleto()) || esVacio(u.getNit())
+                || esVacio(u.getTelefono()) || esVacio(u.getDireccion()) || esVacio(u.getCorreo())) {
+            throw new ValidacionException("Por favor, llene todos los campos obligatorios.");
+        }
+        if (!u.getNit().matches("\\d{8}")) {
+            throw new ValidacionException("El NIT debe tener exactamente 8 dígitos.");
+        }
+        if (!u.getTelefono().matches("\\d{8}")) {
+            throw new ValidacionException("El teléfono debe tener exactamente 8 dígitos, sin espacios.");
+        }
+        if (!u.getCorreo().contains("@")) {
+            throw new ValidacionException("El correo electrónico es inválido.");
+        }
+        Usuario existente = usuarioDAO.obtenerPorCorreo(u.getCorreo());
+        if (existente != null && !existente.getDpi().equals(u.getDpi())) {
+            throw new ValidacionException("Ya existe una cuenta registrada con este correo electrónico.");
+        }
+        usuarioDAO.actualizarAdminSucursal(u);
+    }
+
+    public void desactivarUsuario(String dpi) throws SQLException, ValidacionException {
+        Usuario u = usuarioDAO.obtenerPorDpi(dpi);
+        if (u != null && "ADMIN_SISTEMA".equals(u.getRol()) && u.isEstado()) {
+            int activos = 0;
+            for (Usuario admin : usuarioDAO.obtenerPorRol("ADMIN_SISTEMA")) {
+                if (admin.isEstado()) {
+                    activos++;
+                }
+            }
+            if (activos <= 1) {
+                throw new ValidacionException("No se puede desactivar al último administrador del sistema activo.");
+            }
+        }
+        usuarioDAO.desactivar(dpi);
+    }
+
+    public List<Usuario> listarUsuarios() throws SQLException {
+        return usuarioDAO.obtenerTodos();
+    }
+
+    public void activarUsuario(String dpi) throws SQLException {
+        usuarioDAO.activar(dpi);
     }
 
     public void actualizarPerfil(String dpi, String nombreCompleto, String nit, String telefono, String direccion)

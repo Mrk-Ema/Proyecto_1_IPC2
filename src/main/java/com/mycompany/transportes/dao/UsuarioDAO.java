@@ -159,13 +159,26 @@ public class UsuarioDAO {
 
     public void actualizarPerfil(String dpi, String nombreCompleto, String nit, String telefono, String direccion) throws SQLException {
         String sql = "UPDATE usuario SET nombre_completo = ?, nit = ?, telefono = ?, direccion = ? WHERE dpi = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, nombreCompleto);
             ps.setString(2, nit);
             ps.setString(3, telefono);
             ps.setString(4, direccion);
             ps.setString(5, dpi);
+            ps.executeUpdate();
+        }
+    }
+
+    public void actualizarAdminSucursal(Usuario u) throws SQLException {
+        String sql = "UPDATE usuario SET nombre_completo = ?, nit = ?, telefono = ?, direccion = ?, correo = ?, id_sucursal_origen = ? WHERE dpi = ?";
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, u.getNombreCompleto());
+            ps.setString(2, u.getNit());
+            ps.setString(3, u.getTelefono());
+            ps.setString(4, u.getDireccion());
+            ps.setString(5, u.getCorreo());
+            ps.setInt(6, u.getIdSucursalOrigen());
+            ps.setString(7, u.getDpi());
             ps.executeUpdate();
         }
     }

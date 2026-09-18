@@ -15,9 +15,7 @@ public class SucursalDAO {
     public List<Sucursal> obtenerTodas() throws SQLException {
         String sql = "SELECT * FROM sucursal";
         List<Sucursal> lista = new ArrayList<>();
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 lista.add(mapear(rs));
             }
@@ -27,8 +25,7 @@ public class SucursalDAO {
 
     public Sucursal obtenerPorId(int id) throws SQLException {
         String sql = "SELECT * FROM sucursal WHERE id_sucursal = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -41,8 +38,7 @@ public class SucursalDAO {
 
     public int crear(Sucursal s) throws SQLException {
         String sql = "INSERT INTO sucursal (nombre, direccion, telefono) VALUES (?, ?, ?)";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, s.getNombre());
             ps.setString(2, s.getDireccion());
             ps.setString(3, s.getTelefono());
@@ -58,8 +54,7 @@ public class SucursalDAO {
 
     public void actualizar(Sucursal s) throws SQLException {
         String sql = "UPDATE sucursal SET nombre = ?, direccion = ?, telefono = ? WHERE id_sucursal = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, s.getNombre());
             ps.setString(2, s.getDireccion());
             ps.setString(3, s.getTelefono());
@@ -68,10 +63,17 @@ public class SucursalDAO {
         }
     }
 
+    public void activar(int id) throws SQLException {
+        String sql = "UPDATE sucursal SET estado = TRUE WHERE id_sucursal = ?";
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        }
+    }
+
     public void desactivar(int id) throws SQLException {
         String sql = "UPDATE sucursal SET estado = FALSE WHERE id_sucursal = ?";
-        try (Connection conn = Conexion.obtener();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Conexion.obtener(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
         }

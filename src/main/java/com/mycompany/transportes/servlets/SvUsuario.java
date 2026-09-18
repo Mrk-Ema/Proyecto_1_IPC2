@@ -29,10 +29,16 @@ public class SvUsuario extends HttpServlet {
         try {
             switch (tipoRegistro) {
                 case "admin_sucursal" -> {
+                   HttpSession sesionSistema = request.getSession(false);
+                    Usuario adminActual = sesionSistema != null ? (Usuario) sesionSistema.getAttribute("usuario") : null;
+                    if (adminActual == null || !"ADMIN_SISTEMA".equals(adminActual.getRol())) {
+                        response.sendRedirect("login.jsp");
+                        return;
+                    }
                     Usuario nuevoAdminSucursal = crearUsuarioDesdeRequest(request, "ADMIN_SUCURSAL");
                     nuevoAdminSucursal.setIdSucursalOrigen(Integer.parseInt(request.getParameter("idSucursalOrigen")));
                     usuarioService.registrarAdminSucursal(nuevoAdminSucursal);
-                    response.sendRedirect("crearAdmiSucursal.jsp?exito=admin_creado");
+                    response.sendRedirect("SvAdminSistema");
                 }
                 case "chofer" -> {
                     HttpSession session = request.getSession(false);
@@ -41,7 +47,7 @@ public class SvUsuario extends HttpServlet {
                     nuevoChoferUsuario.setIdSucursalOrigen(adminActual.getIdSucursalOrigen());
                     Chofer nuevoChofer = crearChoferDesdeRequest(request);
                     usuarioService.registrarChofer(nuevoChoferUsuario, nuevoChofer);
-                    response.sendRedirect("crearChofer.jsp?exito=chofer_creado");
+                    response.sendRedirect("crearChofer.jsp");
                 }
                 case "recargar" -> {
                     HttpSession session = request.getSession(false);
@@ -60,7 +66,7 @@ public class SvUsuario extends HttpServlet {
                             response.sendRedirect("home.jsp");
                         }
                     } else {
-                        response.sendRedirect("home.jsp?recarga=ok");
+                        response.sendRedirect("home.jsp");
                     }
                 }
                 case "editarPerfil" -> {
@@ -87,14 +93,14 @@ public class SvUsuario extends HttpServlet {
                     HttpSession session = request.getSession();
                     session.setAttribute("usuario", nuevoCliente);
                     session.removeAttribute("invitado");
-                    response.sendRedirect("home.jsp?registro=exito");
+                    response.sendRedirect("home.jsp");
                 }
             }
         } catch (UsuarioService.ValidacionException | IllegalArgumentException e) {
             request.setAttribute("error", e.getMessage());
             String destino = switch (tipoRegistro) {
                 case "admin_sucursal" ->
-                    "crearAdmiSucursal.jsp";
+                    "formularioAdminSucursal.jsp";
                 case "chofer" ->
                     "crearChofer.jsp";
                 case "editarPerfil" ->
