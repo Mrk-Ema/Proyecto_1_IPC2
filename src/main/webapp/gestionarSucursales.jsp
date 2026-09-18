@@ -12,6 +12,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Gestionar Sucursales</title>
+            <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
@@ -19,14 +20,14 @@
             <h1>Gestionar Sucursales</h1>
 
             <% if (request.getAttribute("error") != null) {%>
-            <p style="color:red;"><%= request.getAttribute("error")%></p>
+            <p class="alert alert-danger"><%= request.getAttribute("error")%></p>
             <% } %>
             <% if (request.getAttribute("msj") != null) {%>
-            <p style="color:green;"><%= request.getAttribute("msj")%></p>
+            <p class="alert alert-success"><%= request.getAttribute("msj")%></p>
             <% } %>
 
-            <a href="SvSucursal?accion=formCrear">Nueva Sucursal</a> |
-            <a href="panelAdminSistema.jsp">Volver al panel</a>
+            <a href="SvSucursal?accion=formCrear" class="btn btn-primary">Nueva Sucursal</a>
+            <a href="panelAdminSistema.jsp" class="btn btn-link">Volver al panel</a>
 
             <table border="1" cellpadding="5">
                 <tr>
@@ -49,18 +50,18 @@
                     <td><%= s.getTelefono() != null ? s.getTelefono() : "—"%></td>
                     <td><%= s.isEstado() ? "Activa" : "Inactiva"%></td>
                     <td>
-                        <a href="SvSucursal?accion=formEditar&idSucursal=<%= s.getIdSucursal()%>">Editar</a>
+                        <a href="SvSucursal?accion=formEditar&idSucursal=<%= s.getIdSucursal()%>" class="btn btn-sm btn-outline-warning">Editar</a>
                         <% if (s.isEstado()) {%>
                         <form action="SvSucursal" method="POST" style="display:inline;">
                             <input type="hidden" name="accion" value="desactivar">
                             <input type="hidden" name="idSucursal" value="<%= s.getIdSucursal()%>">
-                            <button type="submit">Desactivar</button>
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Desactivar</button>
                         </form>
                         <% } else {%>
                         <form action="SvSucursal" method="POST" style="display:inline;">
                             <input type="hidden" name="accion" value="activar">
                             <input type="hidden" name="idSucursal" value="<%= s.getIdSucursal()%>">
-                            <button type="submit">Activar</button>
+                            <button type="submit" class="btn btn-sm btn-outline-success">Activar</button>
                         </form>
                         <% } %>
                     </td>

@@ -9,19 +9,20 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Panel de Administrador de Sucursal</title>
+            <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
         <div class="contenido">
             <h1>Panel de Administrador de sucursal</h1>
-            <a href="SvChofer">Gestionar Choferes</a> |
-            <a href="SvBus">Gestionar Buses</a> |
-            <a href="SvRuta">Gestionar Rutas</a> |
-            <a href="SvViaje">Gestionar Viajes</a> |
-            <a href="SvAlquiler?accion=pendientes">Alquileres por Confirmar</a> |
-            <a href="SvAlquiler?accion=pagados">Alquileres Pagados</a> |
-            <a href="SvMantenimiento">Gastos de Taller</a> 
+            <p><a href="SvChofer" class="btn btn-primary">Gestionar Choferes</a></p>
+            <p><a href="SvBus" class="btn btn-primary">Gestionar Buses</a></p>
+            <p><a href="SvRuta" class="btn btn-primary">Gestionar Rutas</a></p>
+            <p><a href="SvViaje" class="btn btn-primary">Gestionar Viajes</a></p>
+            <p><a href="SvAlquiler?accion=pendientes" class="btn btn-primary">Alquileres por Confirmar</a></p>
+            <p><a href="SvAlquiler?accion=pagados" class="btn btn-primary">Alquileres Pagados</a></p>
+            <p><a href="SvMantenimiento" class="btn btn-primary">Gastos de Taller</a></p>
         </div>
     </body>
 </html>

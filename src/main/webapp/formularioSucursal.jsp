@@ -15,6 +15,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title><%= edicion ? "Editar Sucursal" : "Nueva Sucursal"%></title>
+            <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
@@ -22,7 +23,7 @@
             <h1><%= edicion ? "Editar Sucursal" : "Nueva Sucursal"%></h1>
 
             <% if (request.getAttribute("error") != null) {%>
-            <p style="color:red;"><%= request.getAttribute("error")%></p>
+            <p class="alert alert-danger"><%= request.getAttribute("error")%></p>
             <% }%>
 
             <form action="SvSucursal" method="POST">
@@ -43,9 +44,9 @@
                     <input type="text" name="telefono" maxlength="15"
                            value="<%= edicion ? (s.getTelefono() != null ? s.getTelefono() : "") : (request.getParameter("telefono") != null ? request.getParameter("telefono") : "")%>"></p>
 
-                <button type="submit"><%= edicion ? "Guardar Cambios" : "Crear Sucursal"%></button>
+                <button type="submit" class="btn btn-primary"><%= edicion ? "Guardar Cambios" : "Crear Sucursal"%></button>
             </form>
-            <p><a href="SvSucursal">Volver a la lista</a></p>
+            <p><a href="SvSucursal" class="btn btn-link">Volver a la lista</a></p>
         </div>
     </body>
 </html>

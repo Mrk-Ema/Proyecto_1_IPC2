@@ -11,6 +11,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Formulario Bus</title>
+            <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
@@ -23,7 +24,7 @@
             <h1><%= esEdicion ? "Editar Bus" : "Nuevo Bus"%></h1>
 
             <% if (request.getAttribute("error") != null) {%>
-            <p style="color:red;"><%= request.getAttribute("error")%></p>
+            <p class="alert alert-danger"><%= request.getAttribute("error")%></p>
             <% }%>
 
             <form action="SvBus" method="POST">
@@ -56,10 +57,10 @@
                 <input type="number" step="0.01" name="kilometrajeActual" value="0"></p>
                 <% }%>
 
-                <button type="submit"><%= esEdicion ? "Guardar Cambios" : "Crear Bus"%></button>
+                <button type="submit" class="btn btn-primary"><%= esEdicion ? "Guardar Cambios" : "Crear Bus"%></button>
             </form>
 
-            <a href="SvBus">Volver a la lista</a>
+            <a href="SvBus" class="btn btn-link">Volver a la lista</a>
         </div>
     </body>
 </html>

@@ -14,6 +14,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Asignar Bus y Chofer - Transportes MRK</title>
+            <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>

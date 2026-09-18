@@ -6,11 +6,13 @@
 
 <%@page import="com.mycompany.transportes.modelo.ViajeDisponible"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Selección de Asientos - Transportes MRK</title>
+        <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
@@ -59,18 +61,21 @@
                 <input type="hidden" name="idViaje" value="<%= v.getIdViaje()%>">
 
                 <table>
+                    <c:set var="esCliente" value="${sessionScope.usuario != null && sessionScope.usuario.rol == 'CLIENTE'}"/>
                     <tr>
-                        <% for (int i = 1; i <= v.getCapacidadPasajeros(); i++) {
-                                boolean tomado = v.getAsientosOcupados().contains(i);%>
+                        <c:forEach begin="1" end="${viajeDisponible.capacidadPasajeros}" var="i">
+                            <c:set var="tomado" value="${viajeDisponible.asientosOcupados.contains(i)}"/>
                         <td>
                             <label>
-                                <input type="checkbox" name="asientos" value="<%= i%>"
-                                       <%= (tomado || !esCliente) ? "disabled" : ""%>>
-                                <%= i%><%= tomado ? " (ocupado)" : ""%>
+                                <input type="checkbox" name="asientos" value="${i}"
+                                       ${(tomado || !esCliente) ? "disabled" : ""}>
+                                ${i}${tomado ? " (ocupado)" : ""}
                             </label>
                         </td>
-                        <% if (i % 6 == 0) { %></tr><tr><% } %>
-                        <% }%>
+                        <c:if test="${i % 6 == 0}">
+                            </tr><tr>
+                        </c:if>
+                        </c:forEach>
                     </tr>
                 </table>
 

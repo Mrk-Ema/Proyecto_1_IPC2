@@ -7,11 +7,13 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
 <%@page import="com.mycompany.transportes.modelo.Bus"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Gestionar Buses</title>
+            <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
@@ -19,10 +21,10 @@
             <h1>Gestionar Buses</h1>
 
             <% if (request.getAttribute("error") != null) {%>
-            <p style="color:red;"><%= request.getAttribute("error")%></p>
+            <p class="alert alert-danger"><%= request.getAttribute("error")%></p>
             <% } %>
             <% if (request.getAttribute("msj") != null) {%>
-            <p style="color:green;"><%= request.getAttribute("msj")%></p>
+            <p class="alert alert-success"><%= request.getAttribute("msj")%></p>
             <% } %>
 
             <form action="SvBus" method="GET" style="margin-bottom:10px;">
@@ -34,10 +36,10 @@
                     <option value="Ocupado" ${filtro == 'Ocupado' ? 'selected' : ''}>Ocupado</option>
                     <option value="Taller" ${filtro == 'Taller' ? 'selected' : ''}>En taller</option>
                 </select>
-                <button type="submit">Filtrar</button>
+                <button type="submit" class="btn btn-primary">Filtrar</button>
             </form>
-            <a href="SvBus?accion=formCrear">Nuevo Bus</a> |
-            <a href="panelAdminSucursal.jsp">Volver al panel</a>
+            <a href="SvBus?accion=formCrear" class="btn btn-primary">Nuevo Bus</a>
+            <a href="panelAdminSucursal.jsp" class="btn btn-link">Volver al panel</a>
 
             <table border="1" cellpadding="5">
                 <tr>
@@ -82,18 +84,18 @@
                     </td>
                     <td><%= b.isEstado() ? "Activo" : "Inactivo"%></td>
                     <td>
-                        <a href="SvBus?accion=formEditar&idBus=<%= b.getIdBus()%>">Editar</a>
+                        <a href="SvBus?accion=formEditar&idBus=<%= b.getIdBus()%>" class="btn btn-sm btn-outline-warning">Editar</a>
                         <% if (b.isEstado()) {%>
                         <form action="SvBus" method="POST" style="display:inline;">
                             <input type="hidden" name="accion" value="desactivar">
                             <input type="hidden" name="idBus" value="<%= b.getIdBus()%>">
-                            <button type="submit">Desactivar</button>
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Desactivar</button>
                         </form>
                         <% } else {%>
                         <form action="SvBus" method="POST" style="display:inline;">
                             <input type="hidden" name="accion" value="activar">
                             <input type="hidden" name="idBus" value="<%= b.getIdBus()%>">
-                            <button type="submit">Activar</button>
+                            <button type="submit" class="btn btn-sm btn-outline-success">Activar</button>
                         </form>
                         <% } %>
                     </td>

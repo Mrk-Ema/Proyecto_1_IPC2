@@ -11,6 +11,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Editar Chofer</title>
+            <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
@@ -21,7 +22,7 @@
             <h1>Editar Chofer</h1>
 
             <% if (request.getAttribute("error") != null) {%>
-            <p style="color:red;"><%= request.getAttribute("error")%></p>
+            <p class="alert alert-danger"><%= request.getAttribute("error")%></p>
             <% }%>
 
             <form action="SvChofer" method="POST">
@@ -58,10 +59,10 @@
                 <p><label>Salario base por viaje: </label>
                     <input type="number" step="0.01" name="salarioBaseViaje"
                            value="<%= c != null ? c.getSalarioBaseViaje() : (request.getParameter("salarioBaseViaje") != null ? request.getParameter("salarioBaseViaje") : "")%>"></p>
-                <button type="submit">Guardar Cambios</button>
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
             </form>
 
-            <a href="SvChofer">Volver a la lista</a>
+            <a href="SvChofer" class="btn btn-link">Volver a la lista</a>
         </div>
     </body>
 </html>

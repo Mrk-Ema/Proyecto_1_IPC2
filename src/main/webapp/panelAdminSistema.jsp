@@ -9,17 +9,18 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Panel de Administrador del Sistema</title>
+            <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
 
         <div class="contenido">
             <h1>Panel de Administrador del Sistema</h1>
-            <a href="SvSucursal">Gestionar Sucursales</a> |
-            <a href="SvAdminSistema">Gestionar Admins de Sucursal</a> |
-            <a href="SvAdminSistema?accion=usuarios">Gestionar Usuarios</a> |
-            <a href="SvAdminSistema?accion=formConfig">Configuración</a>
+            <p><a href="SvSucursal" class="btn btn-primary">Gestionar Sucursales</a></p>
+            <p><a href="SvAdminSistema" class="btn btn-primary">Gestionar Admins de Sucursal</a></p>
+            <p><a href="SvAdminSistema?accion=usuarios" class="btn btn-primary">Gestionar Usuarios</a></p>
+            <p><a href="SvAdminSistema?accion=formConfig" class="btn btn-primary">Configuración</a></p>
         </div>
 
     </body>

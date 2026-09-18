@@ -7,11 +7,13 @@
 <%@page import="com.mycompany.transportes.modelo.ViajeDisponible"%>
 <%@page import="java.util.List"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Viajes Regulares - Transportes MRK</title>
+        <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
@@ -58,17 +60,17 @@
             <% } else { %>
             <table border="1">
                 <tr><th>Origen</th><th>Destino</th><th>Salida</th><th>Llegada</th><th>Precio</th><th>Asientos libres</th><th></th></tr>
-                        <% for (ViajeDisponible v : resultado) {%>
+                        <c:forEach items="${resultado}" var="v">
                 <tr>
-                    <td><%= v.getNombreOrigen()%></td>
-                    <td><%= v.getNombreDestino()%></td>
-                    <td><%= v.getFechaHoraSalida()%></td>
-                    <td><%= v.getFechaHoraLlegada()%></td>
-                    <td>Q<%= v.getPrecioBoleto()%></td>
-                    <td><%= v.getAsientosLibresCount()%></td>
-                    <td><a href="SvViajeRegular?accion=asientos&idViaje=<%= v.getIdViaje()%>">Elegir Asientos</a></td>
+                    <td>${v.nombreOrigen}</td>
+                    <td>${v.nombreDestino}</td>
+                    <td>${v.fechaHoraSalida}</td>
+                    <td>${v.fechaHoraLlegada}</td>
+                    <td>Q${v.precioBoleto}</td>
+                    <td>${v.asientosLibresCount}</td>
+                    <td><a href="SvViajeRegular?accion=asientos&idViaje=${v.idViaje}">Elegir Asientos</a></td>
                 </tr>
-                <% } %>
+                </c:forEach>
             </table>
             <% }%>
         </div>

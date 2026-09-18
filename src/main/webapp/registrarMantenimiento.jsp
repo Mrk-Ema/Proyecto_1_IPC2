@@ -12,6 +12,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Registrar Mantenimiento</title>
+            <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
@@ -27,7 +28,7 @@
             <h1>Registrar Mantenimiento / Gastos de Taller</h1>
 
             <% if (request.getAttribute("error") != null) {%>
-            <p style="color:red;"><%= request.getAttribute("error")%></p>
+            <p class="alert alert-danger"><%= request.getAttribute("error")%></p>
             <% }%>
 
             <form action="SvMantenimiento" method="POST">
@@ -61,9 +62,9 @@
                 <p><label>Descripción (opcional): </label>
                     <textarea name="descripcion" rows="2" cols="40"><%= descSel%></textarea></p>
 
-                <button type="submit">Registrar</button>
+                <button type="submit" class="btn btn-primary">Registrar</button>
             </form>
-            <p><a href="SvMantenimiento">Ver historial</a> | <a href="panelAdminSucursal.jsp">Volver al panel</a></p>
+            <p><a href="SvMantenimiento" class="btn btn-link">Ver historial</a> <a href="panelAdminSucursal.jsp" class="btn btn-link">Volver al panel</a></p>
         </div>
     </body>
 </html>

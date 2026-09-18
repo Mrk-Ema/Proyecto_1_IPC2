@@ -20,6 +20,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title><%= edicion ? "Editar Admin de Sucursal" : "Nuevo Admin de Sucursal"%></title>
+            <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
@@ -27,7 +28,7 @@
             <h1><%= edicion ? "Editar Administrador de Sucursal" : "Nuevo Administrador de Sucursal"%></h1>
 
             <% if (request.getAttribute("error") != null) {%>
-            <p style="color:red;"><%= request.getAttribute("error")%></p>
+            <p class="alert alert-danger"><%= request.getAttribute("error")%></p>
             <% }%>
 
             <form action="SvAdminSistema" method="POST">
@@ -73,9 +74,9 @@
                             }%>
                     </select></p>
 
-                <button type="submit"><%= edicion ? "Guardar Cambios" : "Crear Admin"%></button>
+                <button type="submit" class="btn btn-primary"><%= edicion ? "Guardar Cambios" : "Crear Admin"%></button>
             </form>
-            <p><a href="SvAdminSistema">Volver a la lista</a></p>
+            <p><a href="SvAdminSistema" class="btn btn-link">Volver a la lista</a></p>
         </div>
     </body>
 </html>

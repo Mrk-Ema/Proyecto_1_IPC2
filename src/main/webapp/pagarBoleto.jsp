@@ -5,11 +5,13 @@
 --%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="com.mycompany.transportes.modelo.ViajeDisponible, java.util.List"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Confirmar Pago - Transportes MRK</title>
+        <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
@@ -23,11 +25,11 @@
         %>
         <div class="contenido">
             <h2>Confirmación de pago</h2>
-            <p><strong><%= v.getNombreOrigen()%> → <%= v.getNombreDestino()%></strong></p>
-            <p>Salida: <%= v.getFechaHoraSalida()%> | Bus: <%= v.getPlacaBus()%></p>
-            <p>Asientos: <%= asientos%></p>
-            <p>Total a pagar: <strong>Q<%= total%></strong></p>
-            <p>Tu saldo: Q<%= saldo%></p>
+            <p><strong>${viaje.nombreOrigen} → ${viaje.nombreDestino}</strong></p>
+            <p>Salida: ${viaje.fechaHoraSalida} | Bus: ${viaje.placaBus}</p>
+            <p>Asientos: ${asientos}</p>
+            <p>Total a pagar: <strong>Q${total}</strong></p>
+            <p>Tu saldo: Q${saldo}</p>
 
             <% if (error != null) { %>
             <p style="color: red"><%= error%></p>
@@ -35,14 +37,14 @@
 
             <form action="SvBoleto" method="post">
                 <input type="hidden" name="accion" value="pagar">
-                <input type="hidden" name="idViaje" value="<%= v.getIdViaje()%>">
-                <% for (Integer a : asientos) { %>
-                <input type="hidden" name="asientos" value="<%= a%>">
-                <% } %>
+                <input type="hidden" name="idViaje" value="${viaje.idViaje}">
+                <c:forEach items="${asientos}" var="a">
+                <input type="hidden" name="asientos" value="${a}">
+                </c:forEach>
                 <label>Contraseña para autorizar:
                     <input type="password" name="password" required>
                 </label>
-                <button type="submit">Pagar Q<%= total%></button>
+                <button type="submit">Pagar Q${total}</button>
             </form>
 
             <% if (faltante != null) { %>

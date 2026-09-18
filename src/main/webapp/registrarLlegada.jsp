@@ -11,6 +11,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Registrar Llegada - Transportes MRK</title>
+            <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
@@ -24,7 +25,7 @@
             <h2>Registrar Llegada - Viaje #<%= v != null ? v.getIdViaje() : ""%></h2>
 
             <% if (request.getAttribute("error") != null) {%>
-            <p style="color:red;"><%= request.getAttribute("error")%></p>
+            <p class="alert alert-danger"><%= request.getAttribute("error")%></p>
             <% }%>
 
             <% if (v != null) {%>
@@ -50,11 +51,11 @@
 
                 <p><em>La depreciación se calcula automáticamente según la configuración del sistema.</em></p>
 
-                <button type="submit">Registrar Llegada</button>
+                <button type="submit" class="btn btn-primary">Registrar Llegada</button>
             </form>
             <% }%>
 
-            <p><a href="SvViaje">Volver a la lista</a></p>
+            <p><a href="SvViaje" class="btn btn-link">Volver a la lista</a></p>
         </div>
     </body>
 </html>

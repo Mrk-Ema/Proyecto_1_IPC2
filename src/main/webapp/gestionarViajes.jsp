@@ -28,6 +28,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Gestionar Viajes</title>
+            <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
@@ -35,14 +36,14 @@
             <h1>Gestionar Viajes</h1>
 
             <% if (request.getAttribute("error") != null) {%>
-            <p style="color:red;"><%= request.getAttribute("error")%></p>
+            <p class="alert alert-danger"><%= request.getAttribute("error")%></p>
             <% } %>
             <% if (request.getAttribute("msj") != null) {%>
-            <p style="color:green;"><%= request.getAttribute("msj")%></p>
+            <p class="alert alert-success"><%= request.getAttribute("msj")%></p>
             <% } %>
 
-            <a href="SvViaje?accion=formCrear">Nuevo Viaje</a> |
-            <a href="panelAdminSucursal.jsp">Volver al panel</a>
+            <a href="SvViaje?accion=formCrear" class="btn btn-primary">Nuevo Viaje</a>
+            <a href="panelAdminSucursal.jsp" class="btn btn-link">Volver al panel</a>
 
             <table border="1" cellpadding="5">
                 <tr>
@@ -78,17 +79,17 @@
                     <td><%= v.getFechaHoraLlegadaReal() != null ? v.getFechaHoraLlegadaReal() : "—"%></td>
                     <td>
                         <% if ("PROGRAMADO".equals(v.getEstadoOperativo())) {%>
-                        <a href="SvViaje?accion=formEditar&idViaje=<%= v.getIdViaje()%>">Editar</a>
-                        <a href="SvViaje?accion=formSalida&idViaje=<%= v.getIdViaje()%>">Registrar Salida</a>
+                        <a href="SvViaje?accion=formEditar&idViaje=<%= v.getIdViaje()%>" class="btn btn-sm btn-outline-warning">Editar</a>
+                        <a href="SvViaje?accion=formSalida&idViaje=<%= v.getIdViaje()%>" class="btn btn-sm btn-outline-primary">Registrar Salida</a>
                         <% } %>
                         <% if ("EN_TRANSITO".equals(v.getEstadoOperativo())) {%>
-                        <a href="SvViaje?accion=formLlegada&idViaje=<%= v.getIdViaje()%>">Registrar Llegada</a>
+                        <a href="SvViaje?accion=formLlegada&idViaje=<%= v.getIdViaje()%>" class="btn btn-sm btn-outline-primary">Registrar Llegada</a>
                         <% } %>
                         <% if ("PROGRAMADO".equals(v.getEstadoOperativo()) && "REGULAR".equals(v.getTipoViaje())) {%>
                         <form action="SvViaje" method="POST" style="display:inline;">
                             <input type="hidden" name="accion" value="eliminar">
                             <input type="hidden" name="idViaje" value="<%= v.getIdViaje()%>">
-                            <button type="submit" onclick="return confirm('¿Eliminar este viaje?');">Eliminar</button>
+                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar este viaje?');">Eliminar</button>
                         </form>
                         <% } %>
                     </td>

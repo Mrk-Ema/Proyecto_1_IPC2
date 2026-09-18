@@ -15,6 +15,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Formulario Viaje</title>
+            <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
@@ -36,7 +37,7 @@
             <h1><%= esEdicion ? "Editar Viaje" : "Nuevo Viaje"%></h1>
 
             <% if (request.getAttribute("error") != null) {%>
-            <p style="color:red;"><%= request.getAttribute("error")%></p>
+            <p class="alert alert-danger"><%= request.getAttribute("error")%></p>
             <% }%>
 
             <form action="SvViaje" method="POST">
@@ -98,10 +99,10 @@
                         %>
                     </select></p>
 
-                <button type="submit"><%= esEdicion ? "Guardar Cambios" : "Crear Viaje"%></button>
+                <button type="submit" class="btn btn-primary"><%= esEdicion ? "Guardar Cambios" : "Crear Viaje"%></button>
             </form>
 
-            <a href="SvViaje">Volver a la lista</a>
+            <a href="SvViaje" class="btn btn-link">Volver a la lista</a>
         </div>
     </body>
 </html>

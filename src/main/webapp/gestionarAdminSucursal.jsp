@@ -13,6 +13,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Gestionar Administradores de Sucursal</title>
+            <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
@@ -20,14 +21,14 @@
             <h1>Gestionar Administradores de Sucursal</h1>
 
             <% if (request.getAttribute("error") != null) {%>
-            <p style="color:red;"><%= request.getAttribute("error")%></p>
+            <p class="alert alert-danger"><%= request.getAttribute("error")%></p>
             <% } %>
             <% if (request.getAttribute("msj") != null) {%>
-            <p style="color:green;"><%= request.getAttribute("msj")%></p>
+            <p class="alert alert-success"><%= request.getAttribute("msj")%></p>
             <% } %>
 
-            <a href="SvAdminSistema?accion=formCrear">Nuevo Admin de Sucursal</a> |
-            <a href="panelAdminSistema.jsp">Volver al panel</a>
+            <a href="SvAdminSistema?accion=formCrear" class="btn btn-primary">Nuevo Admin de Sucursal</a>
+            <a href="panelAdminSistema.jsp" class="btn btn-link">Volver al panel</a>
 
             <table border="1" cellpadding="5">
                 <tr>
@@ -51,18 +52,18 @@
                     <td><%= a.getCorreo()%></td>
                     <td><%= a.isEstado() ? "Activo" : "Inactivo"%></td>
                     <td>
-                        <a href="SvAdminSistema?accion=formEditar&dpi=<%= a.getDpi()%>">Editar</a>
+                        <a href="SvAdminSistema?accion=formEditar&dpi=<%= a.getDpi()%>" class="btn btn-sm btn-outline-warning">Editar</a>
                         <% if (a.isEstado()) {%>
                         <form action="SvAdminSistema" method="POST" style="display:inline;">
                             <input type="hidden" name="accion" value="desactivar">
                             <input type="hidden" name="dpi" value="<%= a.getDpi()%>">
-                            <button type="submit">Desactivar</button>
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Desactivar</button>
                         </form>
                         <% } else {%>
                         <form action="SvAdminSistema" method="POST" style="display:inline;">
                             <input type="hidden" name="accion" value="activar">
                             <input type="hidden" name="dpi" value="<%= a.getDpi()%>">
-                            <button type="submit">Activar</button>
+                            <button type="submit" class="btn btn-sm btn-outline-success">Activar</button>
                         </form>
                         <% } %>
                     </td>

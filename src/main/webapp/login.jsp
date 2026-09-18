@@ -10,11 +10,12 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Login</title>
+        <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <h1>Bienvenido a Transportes Mrk </h1>
         <% if (request.getAttribute("error") != null) {%>
-        <p style="color:red;"><%= request.getAttribute("error")%></p>
+        <p class="alert alert-danger"><%= request.getAttribute("error")%></p>
 
         <% }%>
         <form action="SvLogin" method="POST">

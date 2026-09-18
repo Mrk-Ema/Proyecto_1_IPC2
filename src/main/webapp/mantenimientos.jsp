@@ -12,6 +12,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Historial de Mantenimientos</title>
+            <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
@@ -19,14 +20,14 @@
             <h1>Historial de Gastos de Taller</h1>
 
             <% if (request.getAttribute("msj") != null) {%>
-            <p style="color:green;"><%= request.getAttribute("msj")%></p>
+            <p class="alert alert-success"><%= request.getAttribute("msj")%></p>
             <% } %>
             <% if (request.getAttribute("error") != null) {%>
-            <p style="color:red;"><%= request.getAttribute("error")%></p>
+            <p class="alert alert-danger"><%= request.getAttribute("error")%></p>
             <% } %>
 
-            <a href="SvMantenimiento?accion=formCrear">Nuevo Registro</a> |
-            <a href="panelAdminSucursal.jsp">Volver al panel</a>
+            <a href="SvMantenimiento?accion=formCrear" class="btn btn-primary">Nuevo Registro</a>
+            <a href="panelAdminSucursal.jsp" class="btn btn-link">Volver al panel</a>
 
             <table border="1" cellpadding="5">
                 <tr>

@@ -11,6 +11,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Gestionar Rutas</title>
+            <jsp:include page="/includes/resources.jsp"/>
     </head>
     <body>
         <%@ include file="header.jsp" %>
@@ -18,14 +19,14 @@
             <h1>Gestionar Rutas</h1>
 
             <% if (request.getAttribute("error") != null) { %>
-                <p style="color:red;"><%= request.getAttribute("error") %></p>
+                <p class="alert alert-danger"><%= request.getAttribute("error") %></p>
             <% } %>
             <% if (request.getAttribute("msj") != null) { %>
-                <p style="color:green;"><%= request.getAttribute("msj") %></p>
+                <p class="alert alert-success"><%= request.getAttribute("msj") %></p>
             <% } %>
 
-            <a href="SvRuta?accion=formCrear">Nueva Ruta</a> |
-            <a href="panelAdminSucursal.jsp">Volver al panel</a>
+            <a href="SvRuta?accion=formCrear" class="btn btn-primary">Nueva Ruta</a>
+            <a href="panelAdminSucursal.jsp" class="btn btn-link">Volver al panel</a>
 
             <table border="1" cellpadding="5">
                 <tr>
@@ -61,7 +62,7 @@
                         <form action="SvRuta" method="POST" style="display:inline;">
                             <input type="hidden" name="accion" value="eliminar">
                             <input type="hidden" name="idRuta" value="<%= r.getIdRuta() %>">
-                            <button type="submit">Eliminar</button>
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
                         </form>
                     </td>
                 </tr>
